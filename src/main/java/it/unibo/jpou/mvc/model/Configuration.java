@@ -1,4 +1,4 @@
-package it.unibo.samplejavafx.mvcexample.model;
+package it.unibo.jpou.mvc.model;
 
 /**
  * Encapsulates the concept of configuration.

@@ -1,4 +1,4 @@
-package it.unibo.samplejavafx;
+package it.unibo.jpou;
 
 import java.awt.FlowLayout;
 

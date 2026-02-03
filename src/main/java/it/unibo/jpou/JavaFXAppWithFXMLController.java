@@ -1,4 +1,4 @@
-package it.unibo.samplejavafx;
+package it.unibo.jpou;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;

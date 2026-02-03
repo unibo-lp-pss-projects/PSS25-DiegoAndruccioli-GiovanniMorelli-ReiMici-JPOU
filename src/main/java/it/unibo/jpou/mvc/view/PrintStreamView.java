@@ -1,10 +1,11 @@
-package it.unibo.samplejavafx.mvcexample.view;
+package it.unibo.jpou.mvc.view;
 
-import it.unibo.samplejavafx.mvcexample.model.DrawResult;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+
+import it.unibo.jpou.mvc.model.DrawResult;
 
 /**
  * This class implements a view that can write on any PrintStream.
