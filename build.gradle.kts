@@ -6,6 +6,8 @@ plugins {
     // You can run your app via task "run": ./gradlew run
     application
 
+    jacoco
+
     /*
      * Adds tasks to export a runnable jar.
      * In order to create it, launch the "shadowJar" task.
@@ -22,7 +24,7 @@ repositories {
 java {
     toolchain {
         // Java version used to compile and run the project
-        languageVersion.set(JavaLanguageVersion.of(21))
+        languageVersion.set(JavaLanguageVersion.of(25))
     }
 }
 
@@ -57,6 +59,16 @@ dependencies {
 tasks.withType<Test> {
     // Enables JUnit 5 Jupiter module
     useJUnitPlatform()
+
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required.set(false)
+        html.required.set(true)
+    }
 }
 
 val main: String by project
