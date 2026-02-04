@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class GameRoomLogicTest {
 
-    private static final int SET_FUN_VALUE = 95;
+    private static final int SET_FUN_VALUE = 99;
 
     private PouStatistics fun;
     private GameRoomLogic gameRoomLogic;

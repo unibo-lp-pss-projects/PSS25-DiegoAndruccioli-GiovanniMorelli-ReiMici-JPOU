@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class BathroomLogicTest {
 
-    private static final int SET_HEALTH_VALUE = 95;
+    private static final int SET_HEALTH_VALUE = 99;
     private PouStatistics health;
     private BathroomLogic bathroomLogic;
 

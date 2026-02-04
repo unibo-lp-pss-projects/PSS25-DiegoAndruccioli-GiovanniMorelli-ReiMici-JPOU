@@ -1,5 +1,8 @@
 package it.unibo.jpou.mvc.model;
 
+import it.unibo.jpou.mvc.model.roomlogic.BathroomLogic;
+import it.unibo.jpou.mvc.model.roomlogic.GameRoomLogic;
+import it.unibo.jpou.mvc.model.roomlogic.KitchenLogic;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -10,7 +13,6 @@ class PouLogicTest {
 
         private static final int POU_DEAD = 0;
         private static final int INCREMENT_STATISTIC_WHEN_POU_SLEEPING_DEAD = 10;
-        private static final int INCREMENT_STATISTIC_ACTION = 20;
 
         private PouLogic pou;
 
@@ -102,8 +104,8 @@ class PouLogicTest {
         @Test
         void testWashActionDelegation() {
                 pou.wash();
-                assertEquals(PouStatistics.STATISTIC_INITIAL_VALUE + INCREMENT_STATISTIC_ACTION, pou.getHealth(),
-                                "Wash delega a BathroomLogic");
+                assertEquals(PouStatistics.STATISTIC_INITIAL_VALUE + BathroomLogic.INCREMENT_ACTION_WASH,
+                        pou.getHealth(), "Wash delega a BathroomLogic");
         }
 
         @Test
@@ -124,14 +126,14 @@ class PouLogicTest {
         @Test
         void testPlayActionDelegation() {
                 pou.play();
-                assertEquals(PouStatistics.STATISTIC_INITIAL_VALUE + INCREMENT_STATISTIC_ACTION, pou.getFun(),
-                                "Play delega a GameRoomLogic");
+                assertEquals(PouStatistics.STATISTIC_INITIAL_VALUE + GameRoomLogic.INCREMENT_ACTION_PLAY,
+                        pou.getFun(), "Play delega a GameRoomLogic");
         }
 
         @Test
         void testEatActionDelegation() {
                 pou.eat();
-                assertEquals(PouStatistics.STATISTIC_INITIAL_VALUE + INCREMENT_STATISTIC_ACTION, pou.getHunger(),
-                                "Eat delega a KitchenLogic");
+                assertEquals(PouStatistics.STATISTIC_INITIAL_VALUE + KitchenLogic.INCREMENT_ACTION_EAT,
+                        pou.getHunger(), "Eat delega a KitchenLogic");
         }
 }
