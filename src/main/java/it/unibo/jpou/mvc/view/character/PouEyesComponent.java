@@ -70,13 +70,14 @@ public final class PouEyesComponent extends Group {
 
     private void updateSinglePupil(final Circle pupil, final double centerX,
                                    final double mouseX, final double mouseY) {
-        final var eyeInScene = this.localToScene(centerX, PouEyesComponent.EYE_Y);
+        final var eyeInScene = this.localToScene(centerX, EYE_Y);
+
         final double dx = mouseX - eyeInScene.getX();
         final double dy = mouseY - eyeInScene.getY();
         final double angle = Math.atan2(dy, dx);
         final double dist = Math.min(MAX_PUPIL_OFFSET, Math.sqrt(dx * dx + dy * dy));
 
         pupil.setCenterX(centerX + Math.cos(angle) * dist);
-        pupil.setCenterY(PouEyesComponent.EYE_Y + Math.sin(angle) * dist);
+        pupil.setCenterY(EYE_Y + Math.sin(angle) * dist);
     }
 }
