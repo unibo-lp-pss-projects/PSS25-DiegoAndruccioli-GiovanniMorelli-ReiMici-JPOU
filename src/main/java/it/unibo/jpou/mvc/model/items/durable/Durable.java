@@ -1,6 +1,6 @@
-package it.unibo.samplejavafx.mvcexample.model.items.durable;
+package it.unibo.jpou.mvc.model.items.durable;
 
-import it.unibo.samplejavafx.mvcexample.model.items.Item;
+import it.unibo.jpou.mvc.model.items.Item;
 
 /**
  * Marker interface for items that are purchased once and persist in the inventory.

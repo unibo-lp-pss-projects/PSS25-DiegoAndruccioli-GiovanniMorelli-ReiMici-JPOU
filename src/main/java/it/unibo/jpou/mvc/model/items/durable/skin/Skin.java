@@ -1,6 +1,6 @@
-package it.unibo.samplejavafx.mvcexample.model.items.durable.skin;
+package it.unibo.jpou.mvc.model.items.durable.skin;
 
-import it.unibo.samplejavafx.mvcexample.model.items.durable.Durable;
+import it.unibo.jpou.mvc.model.items.durable.Durable;
 
 /**
  * Represents a specific durable item that changes the visual appearance (color) of the character.

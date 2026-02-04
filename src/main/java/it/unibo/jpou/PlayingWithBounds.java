@@ -1,4 +1,4 @@
-package it.unibo.samplejavafx;
+package it.unibo.jpou;
 
 import javafx.application.Application;
 import javafx.beans.binding.StringBinding;

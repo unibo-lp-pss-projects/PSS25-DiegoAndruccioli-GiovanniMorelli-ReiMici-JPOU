@@ -1,10 +1,10 @@
-package it.unibo.samplejavafx.mvcexample.controller;
+package it.unibo.jpou.mvc.controller;
 
-import it.unibo.samplejavafx.mvcexample.model.Configuration;
-import it.unibo.samplejavafx.mvcexample.model.DrawNumber;
-import it.unibo.samplejavafx.mvcexample.model.DrawNumberImpl;
-import it.unibo.samplejavafx.mvcexample.model.DrawResult;
-import it.unibo.samplejavafx.mvcexample.view.DrawNumberView;
+import it.unibo.jpou.mvc.model.Configuration;
+import it.unibo.jpou.mvc.model.DrawNumber;
+import it.unibo.jpou.mvc.model.DrawNumberImpl;
+import it.unibo.jpou.mvc.model.DrawResult;
+import it.unibo.jpou.mvc.view.DrawNumberView;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;

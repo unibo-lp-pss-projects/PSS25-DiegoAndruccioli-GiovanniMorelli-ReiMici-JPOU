@@ -1,4 +1,4 @@
-package it.unibo.samplejavafx.mvcexample.model.items;
+package it.unibo.jpou.mvc.model.items;
 
 /**
  * Represents the fundamental contract for any entity in the game economy.

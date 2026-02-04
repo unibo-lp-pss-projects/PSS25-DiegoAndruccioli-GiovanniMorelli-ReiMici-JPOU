@@ -1,6 +1,6 @@
-package it.unibo.samplejavafx.mvcexample.view;
+package it.unibo.jpou.mvc.view;
 
-import it.unibo.samplejavafx.mvcexample.model.DrawResult;
+import it.unibo.jpou.mvc.model.DrawResult;
 
 /**
  *

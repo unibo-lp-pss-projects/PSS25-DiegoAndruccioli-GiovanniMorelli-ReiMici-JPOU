@@ -1,6 +1,6 @@
-package it.unibo.samplejavafx.mvcexample.model.items.consumable;
+package it.unibo.jpou.mvc.model.items.consumable;
 
-import it.unibo.samplejavafx.mvcexample.model.items.Item;
+import it.unibo.jpou.mvc.model.items.Item;
 
 /**
  * Represents a specific category of items that are removed from the inventory after the use.

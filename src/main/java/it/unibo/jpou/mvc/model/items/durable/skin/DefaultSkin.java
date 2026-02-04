@@ -1,4 +1,4 @@
-package it.unibo.samplejavafx.mvcexample.model.items.durable.skin;
+package it.unibo.jpou.mvc.model.items.durable.skin;
 
 /**
  * Implementation of the default skin for the character.

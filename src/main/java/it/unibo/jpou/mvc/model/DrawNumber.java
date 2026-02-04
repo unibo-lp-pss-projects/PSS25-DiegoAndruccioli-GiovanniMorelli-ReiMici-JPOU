@@ -1,4 +1,4 @@
-package it.unibo.samplejavafx.mvcexample.model;
+package it.unibo.jpou.mvc.model;
 
 /**
  * This class models a draw number game.

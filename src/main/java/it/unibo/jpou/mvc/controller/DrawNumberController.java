@@ -1,6 +1,6 @@
-package it.unibo.samplejavafx.mvcexample.controller;
+package it.unibo.jpou.mvc.controller;
 
-import it.unibo.samplejavafx.mvcexample.view.DrawNumberView;
+import it.unibo.jpou.mvc.view.DrawNumberView;
 
 /**
  * Controller interface.
