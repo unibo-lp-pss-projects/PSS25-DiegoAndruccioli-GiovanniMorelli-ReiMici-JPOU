@@ -5,27 +5,32 @@ package it.unibo.samplejavafx.mvcexample.model.items.durable.skin;
  * Provides the baseline aesthetic at no cost.
  */
 public class DefaultSkin implements Skin {
-        /**
-         * @return the Skin name.
-         */
-        @Override
-        public String getName() {
-            return "Default";
-        }
 
-        /**
-         * @return 0 as the default skin is free.
-         */
-        @Override
-        public int getPrice() {
-            return 0;
-        }
+    private static final String DEFAULT_NAME = "Default";
+    private static final int DEFAULT_PRICE = 0;
+    private static final String DEFAULT_COLOR = "#E3C072";
 
-        /**
-         * @return the hexadecimal code for the classic color.
-         */
-        @Override
-        public String getColorHex() {
-            return "#E3C072";
-        }
+    /**
+     * @return the Skin name.
+     */
+    @Override
+    public String getName() {
+        return DEFAULT_NAME;
+    }
+
+    /**
+     * @return 0 as the default skin is free.
+     */
+    @Override
+    public int getPrice() {
+        return DEFAULT_PRICE;
+    }
+
+    /**
+     * @return the hexadecimal code for the classic color.
+     */
+    @Override
+    public String getColorHex() {
+        return DEFAULT_COLOR;
+    }
 }
