@@ -58,7 +58,6 @@ public final class FruitCatcherGame implements Minigame {
     private void spawnObjects() {
         if (this.random.nextInt(MAX_RANDOM) < SPAWN_THRESHOLD) {
             final double x = this.random.nextInt(GAME_WIDTH - OBJ_SIZE);
-            // Seleziona un tipo casuale tra APPLE, PINEAPPLE, BANANA, BOMB
             final FallingObject.Type[] types = FallingObject.Type.values();
             final FallingObject.Type selectedType = types[this.random.nextInt(types.length)];
 
@@ -70,7 +69,6 @@ public final class FruitCatcherGame implements Minigame {
         final Iterator<FallingObject> iterator = this.fallingObjects.iterator();
         while (iterator.hasNext()) {
             final FallingObject obj = iterator.next();
-            // CORRETTO: Chiamiamo fall() invece di update()
             obj.fall(GRAVITY);
 
             if (obj.getY() > GAME_HEIGHT) {
@@ -85,10 +83,8 @@ public final class FruitCatcherGame implements Minigame {
             final FallingObject obj = iterator.next();
             if (isColliding(obj)) {
                 if (obj.isBomb()) {
-                    // Morte istantanea se è una bomba
                     this.gameOver = true;
                 } else {
-                    // Aggiunge il valore specifico del frutto
                     this.score += obj.getValue();
                 }
                 iterator.remove();
@@ -121,7 +117,7 @@ public final class FruitCatcherGame implements Minigame {
     /**
      * Updates the player's horizontal position.
      *
-     * @param x the new x position (e.g. from mouse).
+     * @param x the new x position
      */
     public void setPlayerPosition(final double x) {
         this.playerX = x;
@@ -134,5 +130,12 @@ public final class FruitCatcherGame implements Minigame {
      */
     public List<FallingObject> getFallingObjects() {
         return Collections.unmodifiableList(this.fallingObjects);
+    }
+
+    /**
+     * @return the current X position of the player.
+     */
+    public double getPlayerX() {
+        return this.playerX;
     }
 }
