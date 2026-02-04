@@ -1,0 +1,9 @@
+.kitchen-view {
+    -fx-background-color: #ffb3b3;
+}
+
+.selected-food-label {
+    -fx-font-size: 16px;
+    -fx-text-fill: #555;
+    -fx-font-weight: bold;
+}

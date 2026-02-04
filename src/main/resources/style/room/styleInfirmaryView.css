@@ -1,0 +1,9 @@
+.infirmary-view {
+    -fx-background-color: #e0f7fa;
+}
+
+.selected-potion-label {
+    -fx-font-size: 16px;
+    -fx-text-fill: #006064;
+    -fx-font-weight: bold;
+}

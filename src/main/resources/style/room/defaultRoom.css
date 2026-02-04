@@ -1,0 +1,28 @@
+.room-title {
+    -fx-text-fill: black;
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+}
+
+.character-area {
+    -fx-alignment: center;
+}
+
+.character-placeholder {
+    -fx-fill: white;
+    -fx-stroke: black;
+    -fx-stroke-width: 2;
+}
+
+.action-bar {
+    -fx-alignment: center;
+    -fx-spacing: 40;
+    -fx-padding: 10;
+}
+
+.action-button {
+    -fx-background-radius: 8px;
+    -fx-font-size: 14px;
+    -fx-pref-width: 120;
+    -fx-pref-height: 50;
+}

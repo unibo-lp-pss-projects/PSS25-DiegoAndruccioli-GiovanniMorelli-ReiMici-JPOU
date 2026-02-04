@@ -1,0 +1,35 @@
+.shop-view {
+    -fx-background-color: #f4f4f4;
+}
+
+.shop-feedback-label {
+    -fx-font-size: 16px;
+    -fx-text-fill: #555;
+}
+
+.items-container {
+    -fx-padding: 20;
+}
+
+/* Stili per i bottoni degli oggetti (da usare quando creeremo gli ShopItem) */
+.shop-item-button {
+    -fx-background-color: white;
+    -fx-border-color: #cccccc;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-font-size: 14px;
+    -fx-text-fill: #333333;
+    -fx-cursor: hand;
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+    -fx-wrap-text: true;
+}
+
+.shop-item-button:hover {
+    -fx-background-color: #e0e0e0;
+    -fx-border-color: #999999;
+}
+
+.shop-item-button:pressed {
+    -fx-background-color: #d0d0d0;
+}
