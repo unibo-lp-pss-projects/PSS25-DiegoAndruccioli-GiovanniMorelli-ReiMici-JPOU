@@ -1,0 +1,52 @@
+.top-nav-bar {
+    -fx-background-color: midnightblue;
+    -fx-padding: 10;
+}
+
+.coins-label {
+    -fx-text-fill: Gold;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.stat-label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+.progress-bar {
+    -fx-pref-width: 100;
+    -fx-pref-height: 12;
+}
+
+.stat-value {
+    -fx-text-fill: white;
+    -fx-font-size: 11px;
+}
+
+.settings-button {
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.bottom-nav-bar {
+    -fx-background-color: midnightblue;
+    -fx-padding: 10;
+}
+
+.room-button {
+    -fx-font-size: 14px;
+    -fx-background-radius: 8px;
+    -fx-pref-height: 50;
+}
+
+.center-container {
+    -fx-background-color: whitesmoke;
+}
+
+.default-label {
+    -fx-font-size: 24px;
+    -fx-text-fill: slategray;
+}
