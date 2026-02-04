@@ -54,7 +54,7 @@ class ShopTest {
     @Test
     @DisplayName("Test purchase failure due to insufficient funds")
     void testInsufficientFunds() {
-        final Item expensiveItem = new RedSkin(); // Costa 50
+        final Item expensiveItem = new RedSkin();
         LOGGER.info("Attempting to buy " + expensiveItem.getName() + " with only " + INSUFFICIENT_BALANCE);
 
         assertThrows(IllegalArgumentException.class, () -> {
