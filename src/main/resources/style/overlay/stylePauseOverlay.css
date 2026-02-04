@@ -1,0 +1,33 @@
+.pause-overlay {
+    -fx-background-color: rgba(0, 0, 0, 0.7);
+}
+
+.pause-box {
+    -fx-background-color: white;
+    -fx-background-radius: 15;
+    -fx-padding: 30;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 10, 0, 0, 5);
+}
+
+.overlay-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: black;
+}
+
+.overlay-button {
+    -fx-font-size: 16px;
+    -fx-pref-width: 180;
+    -fx-pref-height: 40;
+    -fx-background-radius: 8;
+}
+
+.resume-button {
+    -fx-background-color: green;
+    -fx-text-fill: black;
+}
+
+.quit-button {
+    -fx-background-color: red;
+    -fx-text-fill: black;
+}
