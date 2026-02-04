@@ -11,12 +11,11 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
-
 import java.util.Objects;
 
 /**
  * The root container of the UI.
- * Refactored to avoid exposing internal representation (SpotBugs EI_EXPOSE_REP).
+ * Assembles the TopBar, BottomBar, CenterContainer and Overlays.
  */
 public final class MainView extends StackPane {
 
@@ -24,7 +23,7 @@ public final class MainView extends StackPane {
 
     private final TopBarComponent topBar;
     private final BottomNavBarComponent bottomBar;
-    private final CenterContainerComponent centerArea;
+    private final CenterContainerComponent centerContainer;
     private final PauseOverlayView pauseOverlay;
     private final GameOverOverlayView gameOverOverlay;
 
@@ -37,13 +36,13 @@ public final class MainView extends StackPane {
 
         this.topBar = new TopBarComponent(STATS);
         this.bottomBar = new BottomNavBarComponent(Room.values());
-        this.centerArea = new CenterContainerComponent();
+        this.centerContainer = new CenterContainerComponent();
         this.pauseOverlay = new PauseOverlayView();
         this.gameOverOverlay = new GameOverOverlayView();
 
         final BorderPane mainLayout = new BorderPane();
         mainLayout.setTop(this.topBar);
-        mainLayout.setCenter(this.centerArea);
+        mainLayout.setCenter(this.centerContainer);
         mainLayout.setBottom(this.bottomBar);
 
         this.pauseOverlay.setVisible(false);
@@ -56,18 +55,18 @@ public final class MainView extends StackPane {
      * Updates a statistic in the top bar.
      *
      * @param key the stat name.
-     * @param val the value.
-     * @param txt the label.
+     * @param val the value (0.0 - 1.0).
+     * @param txt the text label.
      */
     public void updateStat(final String key, final double val, final String txt) {
         this.topBar.updateStat(key, val, txt);
     }
 
     /**
-     * Sets the room change handler for a specific room.
+     * Sets the room change handler for a specific room button.
      *
-     * @param room the room.
-     * @param handler the action.
+     * @param room the room enum.
+     * @param handler the event to fire.
      */
     public void setOnRoomChange(final Room room, final EventHandler<ActionEvent> handler) {
         this.bottomBar.setOnRoomChange(room, handler);
@@ -92,12 +91,12 @@ public final class MainView extends StackPane {
     }
 
     /**
-     * Switches the current room.
+     * Switches the current room view.
      *
-     * @param room the room view.
+     * @param room the new room view object.
      */
     public void setRoom(final AbstractRoomView room) {
-        this.centerArea.setRoom(room);
+        this.centerContainer.setRoom(room);
     }
 
     /**
@@ -119,11 +118,11 @@ public final class MainView extends StackPane {
     }
 
     /**
-     * Toggles the character's visibility in the center area.
+     * Toggles the character's visibility.
      *
-     * @param visible true to show, false to hide.
+     * @param visible true to show.
      */
     public void setCharacterVisible(final boolean visible) {
-        this.centerArea.setCharacterVisible(visible);
+        this.centerContainer.setCharacterVisible(visible);
     }
 }
