@@ -62,8 +62,14 @@ public final class TopBarComponent extends HBox {
 
         final String formattedLabel = key.substring(0, 1).toUpperCase(Locale.ROOT) + key.substring(1);
         final Label label = new Label(formattedLabel);
+
+        label.getStyleClass().add("stat-label");
+
         final ProgressBar bar = new ProgressBar(INITIAL_PROGRESS);
+        bar.getStyleClass().add("progress-bar");
+
         final Label val = new Label("50/100");
+        val.getStyleClass().add("stat-value");
 
         this.progressBars.put(key, bar);
         this.valueLabels.put(key, val);
