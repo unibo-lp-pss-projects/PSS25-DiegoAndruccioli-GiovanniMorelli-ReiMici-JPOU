@@ -7,7 +7,7 @@ package it.unibo.jpou.mvc.controller.minigames;
 public interface FruitCatcherController extends GameLifecycle {
 
     /**
-     * Updates the player's horizontal position based on input.
+     * Updates the player's horizontal position based on input (by keys).
      *
      * @param x the new X coordinate.
      */
