@@ -9,13 +9,13 @@ import it.unibo.jpou.mvc.view.overlay.PauseOverlayView;
 import it.unibo.jpou.mvc.view.room.AbstractRoomView;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.Parent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import java.util.Objects;
 
 /**
  * The root container of the UI.
- * Assembles the TopBar, BottomBar, CenterContainer and Overlays.
  */
 public final class MainView extends StackPane {
 
@@ -26,6 +26,8 @@ public final class MainView extends StackPane {
     private final CenterContainerComponent centerContainer;
     private final PauseOverlayView pauseOverlay;
     private final GameOverOverlayView gameOverOverlay;
+
+    private final BorderPane mainLayout;
 
     /**
      * Assemblies the entire game interface.
@@ -40,15 +42,38 @@ public final class MainView extends StackPane {
         this.pauseOverlay = new PauseOverlayView();
         this.gameOverOverlay = new GameOverOverlayView();
 
-        final BorderPane mainLayout = new BorderPane();
-        mainLayout.setTop(this.topBar);
-        mainLayout.setCenter(this.centerContainer);
-        mainLayout.setBottom(this.bottomBar);
+        this.mainLayout = new BorderPane();
+        this.mainLayout.setTop(this.topBar);
+        this.mainLayout.setCenter(this.centerContainer);
+        this.mainLayout.setBottom(this.bottomBar);
 
         this.pauseOverlay.setVisible(false);
         this.gameOverOverlay.setVisible(false);
 
         this.getChildren().addAll(mainLayout, this.pauseOverlay, this.gameOverOverlay);
+    }
+
+    /**
+     * Shows a minigame view on top of the main interface.
+     *
+     * @param gameNode the visual root of the minigame.
+     */
+    public void showMinigame(final Parent gameNode) {
+        if (!this.getChildren().contains(gameNode)) {
+            this.getChildren().add(1, gameNode); //livello 1: minigioco. sovrappone la 0
+        }
+        gameNode.setVisible(true);
+        gameNode.requestFocus();
+    }
+
+    /**
+     * Removes the minigame view from the interface.
+     *
+     * @param gameNode the visual root of the minigame to remove.
+     */
+    public void removeMinigame(final Parent gameNode) {
+        this.getChildren().remove(gameNode);
+        this.mainLayout.requestFocus();
     }
 
     /**
@@ -63,44 +88,44 @@ public final class MainView extends StackPane {
     }
 
     /**
-     * Sets the room change handler for a specific room button.
+     * Sets the room change handler.
      *
-     * @param room the room enum.
-     * @param handler the event to fire.
+     * @param room the room to switch to.
+     * @param handler the event handler.
      */
     public void setOnRoomChange(final Room room, final EventHandler<ActionEvent> handler) {
         this.bottomBar.setOnRoomChange(room, handler);
     }
 
     /**
-     * Sets the action for the pause resume button.
+     * Sets the resume action handler.
      *
-     * @param handler the action.
+     * @param handler the event handler.
      */
     public void setOnResumeAction(final EventHandler<ActionEvent> handler) {
         this.pauseOverlay.setOnResume(handler);
     }
 
     /**
-     * Sets the action for the game over restart button.
+     * Sets the restart action handler.
      *
-     * @param handler the action.
+     * @param handler the event handler.
      */
     public void setOnRestartAction(final EventHandler<ActionEvent> handler) {
         this.gameOverOverlay.setOnRestart(handler);
     }
 
     /**
-     * Switches the current room view.
+     * Sets the current room view.
      *
-     * @param room the new room view object.
+     * @param room the room view.
      */
     public void setRoom(final AbstractRoomView room) {
         this.centerContainer.setRoom(room);
     }
 
     /**
-     * Toggles pause overlay visibility.
+     * Shows or hides the pause overlay.
      *
      * @param visible true to show.
      */
@@ -109,7 +134,7 @@ public final class MainView extends StackPane {
     }
 
     /**
-     * Toggles game over overlay visibility.
+     * Shows or hides the game over overlay.
      *
      * @param visible true to show.
      */
@@ -118,7 +143,7 @@ public final class MainView extends StackPane {
     }
 
     /**
-     * Toggles the character's visibility.
+     * Shows or hides the character.
      *
      * @param visible true to show.
      */

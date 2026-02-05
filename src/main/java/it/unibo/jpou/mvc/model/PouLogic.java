@@ -257,4 +257,15 @@ public final class PouLogic {
         this.health.setValueStat(min);
         this.coins.setCoins(min);
     }
+
+    /**
+     * Adds coins to the Pou entity.
+     *
+     * @param amount the amount of coins to add.
+     */
+    public void addCoins(final int amount) {
+        // prendo le monete attuali, aggiungo l'amount, e uso il setter.
+        // il setter si occupa già di controllare canModify().
+        setCoins(getCoins() + amount);
+    }
 }

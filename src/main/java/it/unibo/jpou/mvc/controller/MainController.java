@@ -16,4 +16,9 @@ public interface MainController {
      * Stops the application and releases resources.
      */
     void stop();
+
+    /**
+     * Starts the Fruit Catcher minigame.
+     */
+    void startFruitCatcher();
 }
