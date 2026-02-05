@@ -16,6 +16,7 @@ public final class FruitCatcherControllerImpl implements FruitCatcherController 
     private final Consumer<Integer> coinAwarder;
     private final GameLoop gameLoop;
     private boolean coinsAwarded;
+    private boolean running;
 
     /**
      * Creates a new controller for the Fruit Catcher game.
@@ -30,18 +31,26 @@ public final class FruitCatcherControllerImpl implements FruitCatcherController 
         this.coinAwarder = coinAwarder;
         this.gameLoop = new GameLoop();
         this.coinsAwarded = false;
+        this.running = false;
     }
 
     @Override
     public void startGame() {
         this.model.startGame();
         this.coinsAwarded = false;
+        this.running = true;
         this.gameLoop.start();
     }
 
     @Override
     public void stopGame() {
+        this.running = false;
         this.gameLoop.stop();
+    }
+
+    @Override
+    public boolean isRunning() {
+        return this.running;
     }
 
     @Override
