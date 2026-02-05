@@ -1,6 +1,5 @@
 package it.unibo.jpou.mvc.model.roomlogic;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import it.unibo.jpou.mvc.model.PouState;
 import javafx.beans.property.ObjectProperty;
 
@@ -9,28 +8,21 @@ import javafx.beans.property.ObjectProperty;
  */
 public final class BedroomLogic {
 
-    private final ObjectProperty<PouState> state;
-
-    /**
-     * @param state the state property to modify
-     */
-    @SuppressFBWarnings(value = "EI_EXPOSE_REP2",
-            justification = "Logic classes must modify the passed statistics")
-    public BedroomLogic(final ObjectProperty<PouState> state) {
-        this.state = state;
-    }
-
     /**
      * Put Pou to sleep.
+     *
+     * @param state  the state property to modify
      */
-    public void sleep() {
-        this.state.set(PouState.SLEEPING);
+    public void sleep(final ObjectProperty<PouState> state) {
+        state.set(PouState.SLEEPING);
     }
 
     /**
      * Wake Pou up.
+     *
+     * @param state  the state property to modify
      */
-    public void wakeUp() {
-        this.state.set(PouState.AWAKE);
+    public void wakeUp(final ObjectProperty<PouState> state) {
+        state.set(PouState.AWAKE);
     }
 }

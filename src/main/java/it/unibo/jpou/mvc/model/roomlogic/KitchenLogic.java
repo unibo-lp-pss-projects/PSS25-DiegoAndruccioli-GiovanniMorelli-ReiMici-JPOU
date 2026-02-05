@@ -1,29 +1,22 @@
 package it.unibo.jpou.mvc.model.roomlogic;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import it.unibo.jpou.mvc.model.PouStatistics;
+import it.unibo.jpou.mvc.model.items.consumable.food.Food;
 
 /**
  * Logic for Kitchen, action eat.
  */
 public final class KitchenLogic {
 
-    public static final int INCREMENT_ACTION_EAT = 10;
-    private final PouStatistics hunger;
-
     /**
-     * @param hunger the hunger statistic to modify
+     * Make Pou eat a specific food.
+     *
+     * @param hunger the hunger statistic to modify.
+     * @param food the food item being consumed.
      */
-    @SuppressFBWarnings(value = "EI_EXPOSE_REP2",
-            justification = "Logic classes must modify the passed statistics")
-    public KitchenLogic(final PouStatistics hunger) {
-        this.hunger = hunger;
-    }
-
-    /**
-     * Meke Pou eat.
-     */
-    public void eat() {
-        this.hunger.setValueStat(this.hunger.getValueStat() + INCREMENT_ACTION_EAT);
+    public void eat(final PouStatistics hunger, final Food food) {
+        if (food != null) {
+            hunger.setValueStat(hunger.getValueStat() + food.getEffectValue());
+        }
     }
 }

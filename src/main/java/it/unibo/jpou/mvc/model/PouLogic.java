@@ -1,20 +1,24 @@
 package it.unibo.jpou.mvc.model;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import it.unibo.jpou.mvc.model.items.consumable.food.Food;
+import it.unibo.jpou.mvc.model.items.consumable.potion.Potion;
+import it.unibo.jpou.mvc.model.items.durable.skin.DefaultSkin;
+import it.unibo.jpou.mvc.model.items.durable.skin.Skin;
 import it.unibo.jpou.mvc.model.roomlogic.BathroomLogic;
 import it.unibo.jpou.mvc.model.roomlogic.BedroomLogic;
 import it.unibo.jpou.mvc.model.roomlogic.GameRoomLogic;
 import it.unibo.jpou.mvc.model.roomlogic.InfirmaryLogic;
 import it.unibo.jpou.mvc.model.roomlogic.KitchenLogic;
-import it.unibo.jpou.mvc.model.statistics.HungerStatistic;
 import it.unibo.jpou.mvc.model.statistics.EnergyStatistic;
 import it.unibo.jpou.mvc.model.statistics.FunStatistic;
 import it.unibo.jpou.mvc.model.statistics.HealthStatistic;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import it.unibo.jpou.mvc.model.statistics.HungerStatistic;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 
 /**
- * Main logic class for Pou, aggregating statistics and state.
+ * Main logic class for Pou.
+ * Orchestrates interactions between Statistics, Logic components, and Items.
  */
 public final class PouLogic {
 
@@ -23,7 +27,9 @@ public final class PouLogic {
     private final PouStatistics fun;
     private final PouStatistics health;
     private final PouCoins coins;
-    private final ObjectProperty<PouState> state;
+
+    private final ReadOnlyObjectWrapper<PouState> state;
+    private final ReadOnlyObjectWrapper<Skin> currentSkin;
 
     private final BathroomLogic bathroomLogic;
     private final BedroomLogic bedroomLogic;
@@ -40,171 +46,202 @@ public final class PouLogic {
         this.fun = new FunStatistic();
         this.health = new HealthStatistic();
         this.coins = new PouCoins();
-        this.state = new SimpleObjectProperty<>(PouState.AWAKE);
 
-        this.bathroomLogic = new BathroomLogic(this.health);
-        this.bedroomLogic = new BedroomLogic(this.state);
-        this.gameRoomLogic = new GameRoomLogic(this.fun);
-        this.infirmaryLogic = new InfirmaryLogic(this.energy, this.health);
-        this.kitchenLogic = new KitchenLogic(this.hunger);
+        this.state = new ReadOnlyObjectWrapper<>(PouState.AWAKE);
+        this.currentSkin = new ReadOnlyObjectWrapper<>(new DefaultSkin());
 
-        this.health.valueProperty().addListener(
-                (_, _, newValue) -> {
-                    if (newValue.intValue() <= PouStatistics.STATISTIC_MIN_VALUE) {
-                        handleDeath();
-                    }
-                });
+        this.bathroomLogic = new BathroomLogic();
+        this.bedroomLogic = new BedroomLogic();
+        this.gameRoomLogic = new GameRoomLogic();
+        this.infirmaryLogic = new InfirmaryLogic();
+        this.kitchenLogic = new KitchenLogic();
+
+        this.health.valueProperty().addListener((_, _, newValue) -> {
+            if (newValue.intValue() <= PouStatistics.STATISTIC_MIN_VALUE) {
+                handleDeath();
+            }
+        });
     }
 
     /**
-     * Puts Pou to sleep in BedroomLogic.
+     * Eat a specific food item.
+     *
+     * @param food the food to consume.
+     */
+    public void eat(final Food food) {
+        if (canModify() && food != null) {
+            this.kitchenLogic.eat(this.hunger, food);
+        }
+    }
+
+    /**
+     * Use a specific potion.
+     *
+     * @param potion the potion to drink.
+     */
+    public void usePotion(final Potion potion) {
+        if (canModify() && potion != null) {
+            this.infirmaryLogic.usePotion(this.energy, this.health, potion);
+        }
+    }
+
+    /**
+     * Wear a new skin.
+     *
+     * @param skin the skin to wear.
+     */
+    public void setSkin(final Skin skin) {
+        if (canModify() && skin != null) {
+            this.currentSkin.set(skin);
+        }
+    }
+
+    /**
+     * Put Pou to sleep.
      */
     public void sleep() {
         if (this.state.get() != PouState.DEAD) {
-            this.bedroomLogic.sleep();
+
+            this.bedroomLogic.sleep(this.state);
         }
     }
 
     /**
-     * Wakes Pou up in BedroomLogic.
+     * Wakes Pou up.
      */
     public void wakeUp() {
         if (this.state.get() != PouState.DEAD) {
-            this.bedroomLogic.wakeUp();
+            this.bedroomLogic.wakeUp(this.state);
         }
     }
 
     /**
-     * Wash Pou in BathroomLogic.
+     * Wash Pou.
      */
     public void wash() {
         if (canModify()) {
-            this.bathroomLogic.wash();
+            this.bathroomLogic.wash(this.health);
         }
     }
 
     /**
-     * Play with Pou in GameRoomLogic.
+     * Play with Pou.
      */
     public void play() {
         if (canModify()) {
-            this.gameRoomLogic.play();
+            this.gameRoomLogic.play(this.fun);
         }
     }
 
     /**
-     * Use potion in Infirmary.
-     * 
-     * @param potionName the potion to use
-     */
-    public void usePotion(final String potionName) {
-        if (canModify()) {
-            this.infirmaryLogic.usePotion(potionName);
-        }
-    }
-
-    /**
-     * Feed Pou in KitchenLogic.
-     */
-    public void eat() {
-        if (canModify()) {
-            this.kitchenLogic.eat();
-        }
-    }
-
-    /**
-     * @return the current state of Pou
+     * @return current state.
      */
     public PouState getState() {
         return this.state.get();
     }
 
     /**
-     * @return current hunger value
+     * @return state property (read-only).
+     */
+    public ReadOnlyObjectProperty<PouState> stateProperty() {
+
+        return this.state.getReadOnlyProperty();
+    }
+
+    /**
+     * @return current skin.
+     */
+    public Skin getSkin() {
+        return this.currentSkin.get();
+    }
+
+    /**
+     * @return skin property (read-only).
+     */
+    public ReadOnlyObjectProperty<Skin> skinProperty() {
+        // SOLUZIONE SPOTBUGS
+        return this.currentSkin.getReadOnlyProperty();
+    }
+
+    /**
+     * @return hunger value.
      */
     public int getHunger() {
         return this.hunger.getValueStat();
     }
 
     /**
-     * @param value new hunger value
+     * @param v new hunger value.
      */
-    public void setHunger(final int value) {
+    public void setHunger(final int v) {
         if (canModify()) {
-            this.hunger.setValueStat(value);
+            this.hunger.setValueStat(v);
         }
     }
 
     /**
-     * @return current energy value
+     * @return energy value.
      */
     public int getEnergy() {
         return this.energy.getValueStat();
     }
 
     /**
-     * @param value new energy value
+     * @param v new energy value.
      */
-    public void setEnergy(final int value) {
+    public void setEnergy(final int v) {
         if (canModify()) {
-            this.energy.setValueStat(value);
+            this.energy.setValueStat(v);
         }
     }
 
     /**
-     * @return current fun value
+     * @return fun value.
      */
     public int getFun() {
         return this.fun.getValueStat();
     }
 
     /**
-     * @param value new fun value
+     * @param v new fun value.
      */
-    public void setFun(final int value) {
+    public void setFun(final int v) {
         if (canModify()) {
-            this.fun.setValueStat(value);
+            this.fun.setValueStat(v);
         }
     }
 
     /**
-     * @return current health value
+     * @return health value.
      */
     public int getHealth() {
         return this.health.getValueStat();
     }
 
     /**
-     * @param value new health value
+     * @param v new health value.
      */
-    public void setHealth(final int value) {
-        if (canModify() || value <= PouStatistics.STATISTIC_MIN_VALUE && this.state.get() != PouState.DEAD) {
-            this.health.setValueStat(value);
+    public void setHealth(final int v) {
+        if (canModify()
+                || v <= PouStatistics.STATISTIC_MIN_VALUE && this.state.get() != PouState.DEAD) {
+            this.health.setValueStat(v);
         }
     }
 
     /**
-     * @return current wallet amount
+     * @return coins amount.
      */
     public int getCoins() {
         return this.coins.getCoins();
     }
 
     /**
-     * @param value new energy value
+     * @param v new coins amount.
      */
-    public void setCoins(final int value) {
+    public void setCoins(final int v) {
         if (canModify()) {
-            this.coins.setCoins(value);
+            this.coins.setCoins(v);
         }
-    }
-
-    /**
-     * @return the Observable State Property
-     */
-    @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "Standard JavaFX pattern implies returning the property object")
-    public ObjectProperty<PouState> stateProperty() {
-        return this.state;
     }
 
     private boolean canModify() {
@@ -213,13 +250,11 @@ public final class PouLogic {
 
     private void handleDeath() {
         this.state.set(PouState.DEAD);
-
-        final int deadValue = PouStatistics.STATISTIC_MIN_VALUE;
-
-        this.hunger.setValueStat(deadValue);
-        this.energy.setValueStat(deadValue);
-        this.fun.setValueStat(deadValue);
-        this.health.setValueStat(deadValue);
-        this.coins.setCoins(deadValue);
+        final int min = PouStatistics.STATISTIC_MIN_VALUE;
+        this.hunger.setValueStat(min);
+        this.energy.setValueStat(min);
+        this.fun.setValueStat(min);
+        this.health.setValueStat(min);
+        this.coins.setCoins(min);
     }
 }

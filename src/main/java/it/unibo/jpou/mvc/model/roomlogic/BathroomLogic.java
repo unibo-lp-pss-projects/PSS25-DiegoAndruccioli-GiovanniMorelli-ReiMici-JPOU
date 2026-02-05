@@ -1,6 +1,5 @@
 package it.unibo.jpou.mvc.model.roomlogic;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import it.unibo.jpou.mvc.model.PouStatistics;
 
 /**
@@ -8,23 +7,14 @@ import it.unibo.jpou.mvc.model.PouStatistics;
  */
 public final class BathroomLogic {
 
-    public static final int INCREMENT_ACTION_WASH = 2;
-    private final PouStatistics health;
-
-    /**
-     * @param health the health statistic to modify
-     */
-    @SuppressFBWarnings(value = "EI_EXPOSE_REP2",
-            justification = "Logic classes must modify the passed statistics")
-    public BathroomLogic(final PouStatistics health) {
-        this.health = health;
-    }
+    private static final int WASH_INCREMENT = 20;
 
     /**
      * Washing action.
+     *
+     * @param health the health statistic to modify (washing improves hygiene/health).
      */
-    public void wash() {
-        this.health.setValueStat(this.health.getValueStat() + INCREMENT_ACTION_WASH);
+    public void wash(final PouStatistics health) {
+        health.setValueStat(health.getValueStat() + WASH_INCREMENT);
     }
-
 }

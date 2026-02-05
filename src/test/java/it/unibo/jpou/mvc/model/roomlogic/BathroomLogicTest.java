@@ -1,7 +1,6 @@
 package it.unibo.jpou.mvc.model.roomlogic;
 
 import it.unibo.jpou.mvc.model.statistics.HealthStatistic;
-import it.unibo.jpou.mvc.model.PouStatistics;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -9,31 +8,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class BathroomLogicTest {
 
-    private static final int SET_HEALTH_VALUE = 99;
-    private PouStatistics health;
+    private static final int INITIAL_VALUE = 50;
     private BathroomLogic bathroomLogic;
+    private HealthStatistic health;
 
     @BeforeEach
     void setUp() {
-        this.health = new HealthStatistic();
-        this.bathroomLogic = new BathroomLogic(this.health);
+        bathroomLogic = new BathroomLogic();
+        health = new HealthStatistic();
+        health.setValueStat(INITIAL_VALUE);
     }
 
     @Test
-    void testWashIncreasesHealth() {
-        final int initialHealth = this.health.getValueStat();
-
-        this.bathroomLogic.wash();
-        assertEquals(initialHealth + BathroomLogic.INCREMENT_ACTION_WASH, this.health.getValueStat(),
-                "La salute è aumentata");
-    }
-
-    @Test
-    void testWashClamping() {
-        this.health.setValueStat(SET_HEALTH_VALUE);
-
-        this.bathroomLogic.wash();
-        assertEquals(PouStatistics.STATISTIC_MAX_VALUE, this.health.getValueStat(),
-                "L'azione wash non deve far aumentare la statistica sopra al limite");
+    void testWash() {
+        final int expectedIncrement = 20;
+        bathroomLogic.wash(health);
+        assertEquals(INITIAL_VALUE + expectedIncrement, health.getValueStat());
     }
 }

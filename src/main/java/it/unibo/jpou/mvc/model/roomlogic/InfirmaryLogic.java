@@ -1,37 +1,31 @@
 package it.unibo.jpou.mvc.model.roomlogic;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import it.unibo.jpou.mvc.model.PouStatistics;
+import it.unibo.jpou.mvc.model.items.consumable.potion.EnergyPotion;
+import it.unibo.jpou.mvc.model.items.consumable.potion.HealthPotion;
+import it.unibo.jpou.mvc.model.items.consumable.potion.Potion;
 
 /**
  * Logic for Infirmary, action use potion.
  */
 public final class InfirmaryLogic {
 
-    public static final int INCREMENT_ENERGY_POTION = 10;
-    public static final int INCREMENT_HEALTH_POTION = 20;
-    private final PouStatistics energy;
-    private final PouStatistics health;
-
     /**
-     * @param energy the energy statistic to modify
-     * @param health the health statistic to modify
+     * Uses a specific potion.
+     *
+     * @param energy the energy statistic to modify.
+     * @param health the health statistic to modify.
+     * @param potion the potion item to use.
      */
-    @SuppressFBWarnings(value = "EI_EXPOSE_REP2",
-            justification = "Logic classes must modify the passed statistics")
-    public InfirmaryLogic(final PouStatistics energy, final PouStatistics health) {
-        this.energy = energy;
-        this.health = health;
-    }
+    public void usePotion(final PouStatistics energy, final PouStatistics health, final Potion potion) {
+        if (potion == null) {
+            return;
+        }
 
-    /**
-     * @param potionName name of potion
-     */
-    public void usePotion(final String potionName) {
-        if ("HealthPotion".equals(potionName)) {
-            this.health.setValueStat(this.health.getValueStat() + INCREMENT_HEALTH_POTION);
-        } else if ("EnergyPotion".equals(potionName)) {
-            this.energy.setValueStat(this.energy.getValueStat() + INCREMENT_ENERGY_POTION);
+        if (potion instanceof HealthPotion) {
+            health.setValueStat(health.getValueStat() + potion.getEffectValue());
+        } else if (potion instanceof EnergyPotion) {
+            energy.setValueStat(energy.getValueStat() + potion.getEffectValue());
         }
     }
 }

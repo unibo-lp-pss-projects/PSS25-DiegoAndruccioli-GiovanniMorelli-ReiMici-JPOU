@@ -15,13 +15,13 @@ class BedroomLogicTest {
     @BeforeEach
     void setUp() {
         this.state = new SimpleObjectProperty<>(PouState.AWAKE);
-        this.bedroomLogic = new BedroomLogic(this.state);
+        this.bedroomLogic = new BedroomLogic();
     }
 
     @Test
     void testSleepIncreasesEnergy() {
 
-        this.bedroomLogic.sleep();
+        this.bedroomLogic.sleep(this.state);
         assertEquals(PouState.SLEEPING, this.state.get(),
                 "Pou deve dormire");
     }
@@ -30,7 +30,7 @@ class BedroomLogicTest {
     void testWakeUp() {
         this.state.set(PouState.SLEEPING);
 
-        this.bedroomLogic.wakeUp();
+        this.bedroomLogic.wakeUp(this.state);
         assertEquals(PouState.AWAKE, this.state.get(),
                 "Pou deve svegliarsi");
     }
