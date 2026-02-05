@@ -12,7 +12,6 @@ import java.util.Objects;
 public final class GameRoomView extends AbstractRoomView {
 
     private final Button fruitCatcherButton;
-    private final Button shopButton;
 
     /**
      * Initializes the Game Room by extending the abstract room structure.
@@ -26,11 +25,9 @@ public final class GameRoomView extends AbstractRoomView {
         this.getStyleClass().add("game-room-view");
 
         this.fruitCatcherButton = new Button("Fruit Catcher");
-        this.shopButton = new Button("Shop");
 
         this.getActionBar().getChildren().addAll(
-                this.fruitCatcherButton,
-                this.shopButton
+                this.fruitCatcherButton
         );
     }
 
@@ -41,14 +38,5 @@ public final class GameRoomView extends AbstractRoomView {
      */
     public void setOnFruitCatcherAction(final EventHandler<ActionEvent> handler) {
         this.fruitCatcherButton.setOnAction(handler);
-    }
-
-    /**
-     * Sets the handler for the Shop button.
-     *
-     * @param handler the action to perform when clicked.
-     */
-    public void setOnShopAction(final EventHandler<ActionEvent> handler) {
-        this.shopButton.setOnAction(handler);
     }
 }
