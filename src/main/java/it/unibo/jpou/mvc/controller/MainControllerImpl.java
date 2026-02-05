@@ -7,6 +7,7 @@ import it.unibo.jpou.mvc.model.Room;
 import it.unibo.jpou.mvc.model.inventory.Inventory;
 import it.unibo.jpou.mvc.model.inventory.InventoryImpl;
 import it.unibo.jpou.mvc.view.MainView;
+import it.unibo.jpou.mvc.view.room.AbstractRoomView;
 import it.unibo.jpou.mvc.view.room.BathroomView;
 import it.unibo.jpou.mvc.view.room.BedroomView;
 import javafx.application.Platform;
@@ -91,8 +92,8 @@ public final class MainControllerImpl implements MainController {
     }
 
     private void setupNavigation() {
-        this.mainView.setOnRoomChange(Room.BEDROOM, _ -> this.mainView.setRoom(this.bedroomView));
-        this.mainView.setOnRoomChange(Room.BATHROOM, _ -> this.mainView.setRoom(this.bathroomView));
+        this.mainView.setOnRoomChange(Room.BEDROOM, _ -> changeRoom(this.bedroomView));
+        this.mainView.setOnRoomChange(Room.BATHROOM, _ -> changeRoom(this.bathroomView));
     }
 
     private void setupGameLoop() {
@@ -117,6 +118,13 @@ public final class MainControllerImpl implements MainController {
         this.mainView.updateStat("health",
                 (double) this.model.getHealth() / PouStatistics.STATISTIC_MAX_VALUE,
                 String.valueOf(this.model.getHealth()));
+    }
+
+    private void changeRoom(final AbstractRoomView newRoomView) {
+        if (!(newRoomView instanceof BedroomView) && this.model.getState() == PouState.SLEEPING) {
+            this.model.wakeUp();
+        }
+        this.mainView.setRoom(newRoomView);
     }
 
     /**
