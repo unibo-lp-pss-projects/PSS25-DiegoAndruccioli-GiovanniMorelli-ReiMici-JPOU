@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
@@ -14,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class PouLogicTest {
 
     private static final int INITIAL_VALUE = 50;
+    private static final int AWAKE_DECAY = 3;
     private PouLogic pou;
 
     @BeforeEach
@@ -53,5 +55,19 @@ class PouLogicTest {
         assertEquals(PouState.SLEEPING, pou.getState());
         pou.wakeUp();
         assertEquals(PouState.AWAKE, pou.getState());
+    }
+
+    @Test
+    void testDecay() {
+        pou.applyDecay();
+
+        final int expected = INITIAL_VALUE - AWAKE_DECAY;
+
+        assertAll("Le statistiche dovrebbero decrementare tutte di AWAKE_DECAY",
+                () -> assertEquals(expected, pou.getHunger()),
+                () -> assertEquals(expected, pou.getEnergy()),
+                () -> assertEquals(expected, pou.getFun()),
+                () -> assertEquals(expected, pou.getHealth())
+        );
     }
 }

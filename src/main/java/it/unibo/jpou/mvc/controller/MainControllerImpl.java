@@ -97,7 +97,10 @@ public final class MainControllerImpl implements MainController {
 
     private void setupGameLoop() {
         if (this.gameLoop instanceof PouGameLoop) {
-            ((PouGameLoop) this.gameLoop).addTickListener(() -> Platform.runLater(this::updateGlobalStatistics));
+            ((PouGameLoop) this.gameLoop).addTickListener(() -> {
+                this.model.applyDecay();
+                Platform.runLater(this::updateGlobalStatistics);
+            });
         }
     }
 

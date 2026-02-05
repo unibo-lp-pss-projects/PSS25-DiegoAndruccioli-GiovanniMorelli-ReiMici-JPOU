@@ -1,5 +1,6 @@
 package it.unibo.jpou.mvc.model;
 
+import it.unibo.jpou.mvc.model.decay.PouStatisticsDecay;
 import it.unibo.jpou.mvc.model.items.consumable.food.Food;
 import it.unibo.jpou.mvc.model.items.consumable.potion.Potion;
 import it.unibo.jpou.mvc.model.items.durable.skin.DefaultSkin;
@@ -37,6 +38,8 @@ public final class PouLogic {
     private final InfirmaryLogic infirmaryLogic;
     private final KitchenLogic kitchenLogic;
 
+    private final PouStatisticsDecay decayLogic;
+
     /**
      * Initializes Pou with default statistics and state.
      */
@@ -55,6 +58,8 @@ public final class PouLogic {
         this.gameRoomLogic = new GameRoomLogic();
         this.infirmaryLogic = new InfirmaryLogic();
         this.kitchenLogic = new KitchenLogic();
+
+        this.decayLogic = new PouStatisticsDecay();
 
         this.health.valueProperty().addListener((_, _, newValue) -> {
             if (newValue.intValue() <= PouStatistics.STATISTIC_MIN_VALUE) {
@@ -241,6 +246,15 @@ public final class PouLogic {
     public void setCoins(final int v) {
         if (canModify()) {
             this.coins.setCoins(v);
+        }
+    }
+
+    /**
+     * Applies the decay to the statistics based on the current state.
+     */
+    public void applyDecay() {
+        if (canModify() || this.state.get() == PouState.SLEEPING) {
+            this.decayLogic.performDecay(this.hunger, this.energy, this.fun, this.health, this.state);
         }
     }
 
