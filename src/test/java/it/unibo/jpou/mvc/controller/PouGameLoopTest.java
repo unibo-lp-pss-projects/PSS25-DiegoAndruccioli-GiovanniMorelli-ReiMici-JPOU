@@ -9,6 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PouGameLoopTest {
 
+    private static final int FAST_LOOP_INTERVAL = 1;
+    private static final int LONGER_INTERVAL_FAST_LOOP = 1500;
     private PouGameLoop gameLoop;
 
     @BeforeEach
@@ -63,5 +65,21 @@ class PouGameLoopTest {
 
         assertFalse(this.gameLoop.isRunning(),
                 "Dopo shutdown() il gioco si chiude e il loop si ferma");
+    }
+
+    @Test
+    void testNotification() throws InterruptedException {
+        this.gameLoop = new PouGameLoop(FAST_LOOP_INTERVAL);
+
+        final boolean[] listenerCalled = {false};
+
+        this.gameLoop.addTickListener(() -> listenerCalled[0] = true);
+        this.gameLoop.start();
+
+        Thread.sleep(LONGER_INTERVAL_FAST_LOOP);
+
+        assertTrue(listenerCalled[0],
+                "Il listener dev'essere eseguito dopo il tick");
+
     }
 }
