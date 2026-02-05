@@ -2,16 +2,50 @@
     -fx-background-color: #f4f4f4;
 }
 
+.shop-title {
+    -fx-font-size: 24px;
+    -fx-text-fill: #333333;
+    -fx-font-weight: bold;
+}
+
 .shop-feedback-label {
     -fx-font-size: 16px;
-    -fx-text-fill: #555;
+    -fx-text-fill: #555555;
+    -fx-font-weight: bold;
+}
+
+.feedback-success {
+    -fx-text-fill: green;
+    -fx-font-weight: bold;
+}
+
+.feedback-error {
+    -fx-text-fill: red;
+    -fx-font-weight: bold;
 }
 
 .items-container {
     -fx-padding: 20;
+    -fx-background-color: transparent;
 }
 
-/* Stili per i bottoni degli oggetti (da usare quando creeremo gli ShopItem) */
+.shop-scroll-pane {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.shop-bottom-panel {
+    -fx-padding: 10;
+    -fx-background-color: #e0e0e0;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1 0 0 0;
+}
+
+.shop-back-button {
+    -fx-font-size: 14px;
+}
+
 .shop-item-button {
     -fx-background-color: white;
     -fx-border-color: #cccccc;
@@ -23,6 +57,8 @@
     -fx-alignment: center;
     -fx-text-alignment: center;
     -fx-wrap-text: true;
+    -fx-min-width: 100px;
+    -fx-min-height: 80px;
 }
 
 .shop-item-button:hover {
