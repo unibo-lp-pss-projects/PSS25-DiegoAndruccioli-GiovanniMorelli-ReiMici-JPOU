@@ -1,6 +1,5 @@
 package it.unibo.jpou.mvc.model;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import it.unibo.jpou.mvc.model.roomlogic.BathroomLogic;
 import it.unibo.jpou.mvc.model.roomlogic.BedroomLogic;
 import it.unibo.jpou.mvc.model.roomlogic.GameRoomLogic;
@@ -25,11 +24,11 @@ public final class PouLogic {
     private final PouCoins coins;
     private final ObjectProperty<PouState> state;
 
-    private final BathroomLogic bathroomLogic;
-    private final BedroomLogic bedroomLogic;
-    private final GameRoomLogic gameRoomLogic;
-    private final InfirmaryLogic infirmaryLogic;
-    private final KitchenLogic kitchenLogic;
+    private final BathroomLogic bathroomLogic = new BathroomLogic();
+    private final BedroomLogic bedroomLogic = new BedroomLogic();
+    private final GameRoomLogic gameRoomLogic = new GameRoomLogic();
+    private final InfirmaryLogic infirmaryLogic = new InfirmaryLogic();
+    private final KitchenLogic kitchenLogic = new KitchenLogic();
 
     /**
      * Initializes Pou with default statistics and state.
@@ -41,12 +40,6 @@ public final class PouLogic {
         this.health = new HealthStatistic();
         this.coins = new PouCoins();
         this.state = new SimpleObjectProperty<>(PouState.AWAKE);
-
-        this.bathroomLogic = new BathroomLogic(this.health);
-        this.bedroomLogic = new BedroomLogic(this.state);
-        this.gameRoomLogic = new GameRoomLogic(this.fun);
-        this.infirmaryLogic = new InfirmaryLogic(this.energy, this.health);
-        this.kitchenLogic = new KitchenLogic(this.hunger);
 
         this.health.valueProperty().addListener(
                 (_, _, newValue) -> {
@@ -61,7 +54,7 @@ public final class PouLogic {
      */
     public void sleep() {
         if (this.state.get() != PouState.DEAD) {
-            this.bedroomLogic.sleep();
+            this.bedroomLogic.sleep(this.state);
         }
     }
 
@@ -70,7 +63,7 @@ public final class PouLogic {
      */
     public void wakeUp() {
         if (this.state.get() != PouState.DEAD) {
-            this.bedroomLogic.wakeUp();
+            this.bedroomLogic.wakeUp(this.state);
         }
     }
 
@@ -79,7 +72,7 @@ public final class PouLogic {
      */
     public void wash() {
         if (canModify()) {
-            this.bathroomLogic.wash();
+            this.bathroomLogic.wash(this.health);
         }
     }
 
@@ -88,7 +81,7 @@ public final class PouLogic {
      */
     public void play() {
         if (canModify()) {
-            this.gameRoomLogic.play();
+            this.gameRoomLogic.play(this.fun);
         }
     }
 
@@ -99,7 +92,7 @@ public final class PouLogic {
      */
     public void usePotion(final String potionName) {
         if (canModify()) {
-            this.infirmaryLogic.usePotion(potionName);
+            this.infirmaryLogic.usePotion(potionName, this.energy, this.health);
         }
     }
 
@@ -108,7 +101,7 @@ public final class PouLogic {
      */
     public void eat() {
         if (canModify()) {
-            this.kitchenLogic.eat();
+            this.kitchenLogic.eat(this.hunger);
         }
     }
 
@@ -197,14 +190,6 @@ public final class PouLogic {
         if (canModify()) {
             this.coins.setCoins(value);
         }
-    }
-
-    /**
-     * @return the Observable State Property
-     */
-    @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "Standard JavaFX pattern implies returning the property object")
-    public ObjectProperty<PouState> stateProperty() {
-        return this.state;
     }
 
     private boolean canModify() {

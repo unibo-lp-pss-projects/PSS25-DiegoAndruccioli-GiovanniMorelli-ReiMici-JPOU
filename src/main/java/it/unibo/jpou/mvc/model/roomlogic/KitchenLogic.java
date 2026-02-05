@@ -1,6 +1,5 @@
 package it.unibo.jpou.mvc.model.roomlogic;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import it.unibo.jpou.mvc.model.PouStatistics;
 
 /**
@@ -9,21 +8,13 @@ import it.unibo.jpou.mvc.model.PouStatistics;
 public final class KitchenLogic {
 
     public static final int INCREMENT_ACTION_EAT = 10;
-    private final PouStatistics hunger;
-
-    /**
-     * @param hunger the hunger statistic to modify
-     */
-    @SuppressFBWarnings(value = "EI_EXPOSE_REP2",
-            justification = "Logic classes must modify the passed statistics")
-    public KitchenLogic(final PouStatistics hunger) {
-        this.hunger = hunger;
-    }
 
     /**
      * Meke Pou eat.
+     *
+     * @param hunger the statistic to modify
      */
-    public void eat() {
-        this.hunger.setValueStat(this.hunger.getValueStat() + INCREMENT_ACTION_EAT);
+    public void eat(final PouStatistics hunger) {
+        hunger.setValueStat(hunger.getValueStat() + INCREMENT_ACTION_EAT);
     }
 }
