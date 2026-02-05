@@ -1,25 +1,15 @@
 package it.unibo.jpou.mvc.controller.minigames;
 
 /**
- * Controller interface for the Fruit Catcher minigame.
- * Handles the game loop and user input.
+ * Interface for the Fruit Catcher minigame controller.
+ * Extends the basic lifecycle with input handling specific to this game.
  */
-public interface FruitCatcherController {
+public interface FruitCatcherController extends GameLifecycle {
 
     /**
-     * Starts the game loop.
-     */
-    void startGame();
-
-    /**
-     * Stops the game loop.
-     */
-    void stopGame();
-
-    /**
-     * Updates the player's position based on input.
+     * Updates the player's horizontal position based on input.
      *
-     * @param x the new horizontal position (e.g. from mouse).
+     * @param x the new X coordinate.
      */
     void updatePlayerPosition(double x);
 }
