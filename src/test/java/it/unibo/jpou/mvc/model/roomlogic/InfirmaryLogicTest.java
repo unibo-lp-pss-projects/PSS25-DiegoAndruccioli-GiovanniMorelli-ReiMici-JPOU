@@ -19,14 +19,14 @@ class InfirmaryLogicTest {
     void setUp() {
         this.energy = new EnergyStatistic();
         this.health = new HealthStatistic();
-        this.infirmaryLogic = new InfirmaryLogic(this.energy, this.health);
+        this.infirmaryLogic = new InfirmaryLogic();
     }
 
     @Test
     void testUseEnergyPotion() {
         final int initialEnergy = this.energy.getValueStat();
 
-        this.infirmaryLogic.usePotion("EnergyPotion");
+        this.infirmaryLogic.usePotion("EnergyPotion", this.energy, this.health);
 
         assertAll("La pozione aumenta solo la statistica dell'energia",
                 () -> assertEquals(initialEnergy + InfirmaryLogic.INCREMENT_ENERGY_POTION,
@@ -38,7 +38,7 @@ class InfirmaryLogicTest {
     void testUseHealthPotion() {
         final int initialHealth = this.health.getValueStat();
 
-        this.infirmaryLogic.usePotion("HealthPotion");
+        this.infirmaryLogic.usePotion("HealthPotion", this.energy, this.health);
 
         assertAll("La pozione aumenta solo la statistica della salute",
                 () -> assertEquals(initialHealth + InfirmaryLogic.INCREMENT_HEALTH_POTION,

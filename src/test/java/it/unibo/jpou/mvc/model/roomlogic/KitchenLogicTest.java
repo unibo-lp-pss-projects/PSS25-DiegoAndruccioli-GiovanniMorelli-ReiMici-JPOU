@@ -15,13 +15,13 @@ class KitchenLogicTest {
     @BeforeEach
     void setUp() {
         this.hunger = new HungerStatistic();
-        this.kitchenLogic = new KitchenLogic(this.hunger);
+        this.kitchenLogic = new KitchenLogic();
     }
 
     @Test
     void testIncreasesHunger() {
         final int initialHunger = this.hunger.getValueStat();
-        this.kitchenLogic.eat();
+        this.kitchenLogic.eat(this.hunger);
 
         assertEquals(initialHunger + KitchenLogic.INCREMENT_ACTION_EAT, this.hunger.getValueStat(),
                 "Mangiare deve aumentare la fame");

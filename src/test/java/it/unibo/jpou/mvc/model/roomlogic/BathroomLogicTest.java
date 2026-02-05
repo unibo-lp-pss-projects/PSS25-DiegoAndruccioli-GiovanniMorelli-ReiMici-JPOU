@@ -16,14 +16,14 @@ class BathroomLogicTest {
     @BeforeEach
     void setUp() {
         this.health = new HealthStatistic();
-        this.bathroomLogic = new BathroomLogic(this.health);
+        this.bathroomLogic = new BathroomLogic();
     }
 
     @Test
     void testWashIncreasesHealth() {
         final int initialHealth = this.health.getValueStat();
 
-        this.bathroomLogic.wash();
+        this.bathroomLogic.wash(this.health);
         assertEquals(initialHealth + BathroomLogic.INCREMENT_ACTION_WASH, this.health.getValueStat(),
                 "La salute è aumentata");
     }
@@ -32,7 +32,7 @@ class BathroomLogicTest {
     void testWashClamping() {
         this.health.setValueStat(SET_HEALTH_VALUE);
 
-        this.bathroomLogic.wash();
+        this.bathroomLogic.wash(this.health);
         assertEquals(PouStatistics.STATISTIC_MAX_VALUE, this.health.getValueStat(),
                 "L'azione wash non deve far aumentare la statistica sopra al limite");
     }
