@@ -7,15 +7,14 @@ import it.unibo.jpou.mvc.model.PouStatistics;
  */
 public final class BathroomLogic {
 
-    public static final int INCREMENT_ACTION_WASH = 2;
+    private static final int WASH_INCREMENT = 20;
 
     /**
      * Washing action.
      *
-     * @param health the statistic to modify
+     * @param health the health statistic to modify (washing improves hygiene/health).
      */
     public void wash(final PouStatistics health) {
-        health.setValueStat(health.getValueStat() + INCREMENT_ACTION_WASH);
+        health.setValueStat(health.getValueStat() + WASH_INCREMENT);
     }
-
 }
