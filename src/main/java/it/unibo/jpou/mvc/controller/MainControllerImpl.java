@@ -68,8 +68,11 @@ public final class MainControllerImpl implements MainController {
     }
 
     private void setupBedroomLogic() {
-        this.model.stateProperty().addListener((_, _, newState) ->
-                Platform.runLater(() -> this.bedroomView.updateView(newState)));
+        this.model.stateProperty().addListener((_, _, newState) -> {
+            Platform.runLater(() -> this.bedroomView.updateView(newState));
+            Platform.runLater(() -> this.mainView.setPouSleeping(newState == PouState.SLEEPING));
+        });
+
 
         this.bedroomView.setOnActionHandler(_ -> {
             if (this.model.getState() == PouState.SLEEPING) {
