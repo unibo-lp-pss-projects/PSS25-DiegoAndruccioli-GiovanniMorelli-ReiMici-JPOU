@@ -14,7 +14,7 @@ public final class FruitCatcherControllerImpl implements FruitCatcherController 
     private final FruitCatcherGame model;
     private final FruitCatcherView view;
     private final Consumer<Integer> coinAwarder;
-    private final GameLoop gameLoop;
+    private final InternalLoop internalLoop;
     private boolean coinsAwarded;
     private boolean running;
 
@@ -29,23 +29,23 @@ public final class FruitCatcherControllerImpl implements FruitCatcherController 
         this.model = new FruitCatcherGame(); //fix spotbugs
         this.view = view;
         this.coinAwarder = coinAwarder;
-        this.gameLoop = new GameLoop();
+        this.internalLoop = new InternalLoop();
         this.coinsAwarded = false;
         this.running = false;
     }
 
     @Override
-    public void startGame() {
+    public void start() {
         this.model.startGame();
         this.coinsAwarded = false;
         this.running = true;
-        this.gameLoop.start();
+        this.internalLoop.start();
     }
 
     @Override
-    public void stopGame() {
+    public void shutdown() {
         this.running = false;
-        this.gameLoop.stop();
+        this.internalLoop.stop();
     }
 
     @Override
@@ -61,12 +61,12 @@ public final class FruitCatcherControllerImpl implements FruitCatcherController 
     /**
      * Inner class extending AnimationTimer to handle the frame-by-frame updates.
      */
-    private final class GameLoop extends AnimationTimer {
+    private final class InternalLoop extends AnimationTimer {
         @Override
         public void handle(final long now) {
             // logica di Game Over
             if (model.isGameOver()) {
-                stopGame();
+                shutdown();
 
                 if (!coinsAwarded) {
                     awardCoins();
