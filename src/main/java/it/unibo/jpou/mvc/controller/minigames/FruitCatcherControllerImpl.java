@@ -37,6 +37,12 @@ public final class FruitCatcherControllerImpl implements FruitCatcherController 
         this.running = false;
 
         this.view.setKeyListener(event -> {
+            if (event.getCode() == KeyCode.ESCAPE) {
+                shutdown();
+                // Nota: Qui il MainController di Diego dovrebbe rilevare che
+                // isRunning() è diventato false e cambiare scena.
+                return;
+            }
             if (!isRunning()) {
                 return;
             }
