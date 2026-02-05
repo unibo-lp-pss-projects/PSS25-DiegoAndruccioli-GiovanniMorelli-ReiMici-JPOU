@@ -3,19 +3,18 @@ package it.unibo.jpou.mvc.model.roomlogic;
 import it.unibo.jpou.mvc.model.PouStatistics;
 
 /**
- * Logic for Game room, action play.
+ * Logic for Game Room, action play.
  */
 public final class GameRoomLogic {
 
-    public static final int INCREMENT_ACTION_PLAY = 2;
+    private static final int PLAY_INCREMENT = 15;
 
     /**
      * Play action.
      *
-     * @param fun the statistic to modify
+     * @param fun the fun statistic to modify.
      */
     public void play(final PouStatistics fun) {
-        fun.setValueStat(fun.getValueStat() + INCREMENT_ACTION_PLAY);
+        fun.setValueStat(fun.getValueStat() + PLAY_INCREMENT);
     }
-
 }
