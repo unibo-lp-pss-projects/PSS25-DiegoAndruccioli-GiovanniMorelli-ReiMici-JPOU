@@ -16,6 +16,7 @@ import java.util.Objects;
  */
 public final class BedroomView extends AbstractRoomView {
 
+    private static final String NIGHT_MODE_STYLE = "night-mode";
     private final Button actionButton;
     private final Button inventoryButton;
 
@@ -56,12 +57,12 @@ public final class BedroomView extends AbstractRoomView {
     public void updateView(final PouState state) {
         if (state == PouState.SLEEPING) {
             this.actionButton.setText("Wake Up");
-            if (!this.getStyleClass().contains("night-mode")) {
-                this.getStyleClass().add("night-mode");
+            if (!this.getStyleClass().contains(NIGHT_MODE_STYLE)) {
+                this.getStyleClass().add(NIGHT_MODE_STYLE);
             }
         } else {
             this.actionButton.setText("Sleep");
-            this.getStyleClass().remove("night-mode");
+            this.getStyleClass().remove(NIGHT_MODE_STYLE);
         }
         this.inventoryButton.setDisable(state == PouState.SLEEPING);
     }
