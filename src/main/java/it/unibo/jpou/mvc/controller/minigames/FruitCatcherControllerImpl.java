@@ -1,8 +1,10 @@
 package it.unibo.jpou.mvc.controller.minigames;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import it.unibo.jpou.mvc.model.minigames.fruitcatcher.FruitCatcherGame;
 import it.unibo.jpou.mvc.view.minigames.FruitCatcherView;
 import javafx.animation.AnimationTimer;
+import javafx.scene.input.KeyCode;
 import java.util.function.Consumer;
 
 /**
@@ -24,14 +26,32 @@ public final class FruitCatcherControllerImpl implements FruitCatcherController 
      * @param view        the game view.
      * @param coinAwarder a function to handle the coins earned (e.g. adding them to Pou).
      */
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "View must be stored to be updated")
     public FruitCatcherControllerImpl(final FruitCatcherView view,
                                       final Consumer<Integer> coinAwarder) {
-        this.model = new FruitCatcherGame(); //fix spotbugs
+        this.model = new FruitCatcherGame();
         this.view = view;
         this.coinAwarder = coinAwarder;
         this.internalLoop = new InternalLoop();
         this.coinsAwarded = false;
         this.running = false;
+
+        this.view.setKeyListener(event -> {
+            if (!isRunning()) {
+                return;
+            }
+
+            final double currentX = model.getPlayerX();
+            final double speed = 20.0;
+
+            if (event.getCode() == KeyCode.LEFT) {
+                updatePlayerPosition(currentX - speed);
+            } else if (event.getCode() == KeyCode.RIGHT) {
+                updatePlayerPosition(currentX + speed);
+            }
+        });
+
+        this.view.requestFocus();
     }
 
     @Override
@@ -39,6 +59,7 @@ public final class FruitCatcherControllerImpl implements FruitCatcherController 
         this.model.startGame();
         this.coinsAwarded = false;
         this.running = true;
+        this.view.requestFocus();
         this.internalLoop.start();
     }
 
@@ -64,7 +85,6 @@ public final class FruitCatcherControllerImpl implements FruitCatcherController 
     private final class InternalLoop extends AnimationTimer {
         @Override
         public void handle(final long now) {
-            // logica di Game Over
             if (model.isGameOver()) {
                 shutdown();
 
@@ -72,15 +92,13 @@ public final class FruitCatcherControllerImpl implements FruitCatcherController 
                     awardCoins();
                 }
 
-                view.render(model.getFallingObjects(), model.getScore(), true, model.getPlayerX());
+                view.render(model.getFallingObjects(), model.getScore(), model.getTimeLeft(), true, model.getPlayerX());
                 return;
             }
 
-            // fisica
             model.gameLoop(now);
 
-            // grafica
-            view.render(model.getFallingObjects(), model.getScore(), false, model.getPlayerX());
+            view.render(model.getFallingObjects(), model.getScore(), model.getTimeLeft(), false, model.getPlayerX());
         }
 
         private void awardCoins() {

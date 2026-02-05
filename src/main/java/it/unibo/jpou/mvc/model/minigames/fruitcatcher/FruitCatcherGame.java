@@ -8,26 +8,33 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Implementation of the Fruit Catcher minigame.
- * The player controls a basket to catch falling fruits while avoiding bombs.
+ * Implementation of the "Fruit Catcher" minigame.
+ * The player controls Pou moving horizontally to catch fruits (points) and avoid bombs (game over).
  */
 public final class FruitCatcherGame implements Minigame {
 
-    private static final int SPAWN_THRESHOLD = 50;
-    private static final int COIN_CONVERSION_RATE = 10;
     private static final int GAME_WIDTH = 800;
     private static final int GAME_HEIGHT = 600;
     private static final int OBJ_SIZE = 40;
     private static final int PLAYER_SIZE = 60;
-    private static final int MAX_RANDOM = 1000;
-    private static final double GRAVITY = 0.2;
-    private static final double PLAYER_Y_POS = GAME_HEIGHT - 100.0;
+    private static final double PLAYER_Y_POS = 500;
+    private static final double GRAVITY = 4.0;
+    private static final double MAX_TIME = 60.0;
+    private static final double TIME_DECREMENT = 0.017;
+
+    private static final double SPAWN_PROBABILITY = 0.02;
+    private static final double BOMB_CHANCE_THRESHOLD = 0.2;
+    private static final double BANANA_CHANCE_THRESHOLD = 0.4;
+    private static final double HITBOX_TOLERANCE_FACTOR = 1.5;
+    private static final double PLAYER_BOUNDARY_OFFSET = 50.0;
 
     private final List<FallingObject> fallingObjects;
     private final Random random;
+
     private int score;
     private boolean gameOver;
-    private double playerX;
+    private double pouX;
+    private double timeLeft;
 
     /**
      * Constructs a new FruitCatcherGame.
@@ -35,6 +42,9 @@ public final class FruitCatcherGame implements Minigame {
     public FruitCatcherGame() {
         this.fallingObjects = new ArrayList<>();
         this.random = new Random();
+        this.timeLeft = MAX_TIME;
+        this.gameOver = false;
+        this.score = 0;
     }
 
     @Override
@@ -42,7 +52,8 @@ public final class FruitCatcherGame implements Minigame {
         this.score = 0;
         this.gameOver = false;
         this.fallingObjects.clear();
-        this.playerX = GAME_WIDTH / 2.0;
+        this.pouX = GAME_WIDTH / 2.0;
+        this.timeLeft = MAX_TIME;
     }
 
     @Override
@@ -50,53 +61,63 @@ public final class FruitCatcherGame implements Minigame {
         if (this.gameOver) {
             return;
         }
-        spawnObjects();
-        updateObjects();
-        checkCollisions();
-    }
 
-    private void spawnObjects() {
-        if (this.random.nextInt(MAX_RANDOM) < SPAWN_THRESHOLD) {
-            final double x = this.random.nextInt(GAME_WIDTH - OBJ_SIZE);
-            final FallingObject.Type[] types = FallingObject.Type.values();
-            final FallingObject.Type selectedType = types[this.random.nextInt(types.length)];
-
-            this.fallingObjects.add(new FallingObject(x, 0, selectedType, OBJ_SIZE, OBJ_SIZE));
+        //  TIMER
+        this.timeLeft -= TIME_DECREMENT;
+        if (this.timeLeft <= 0) {
+            this.timeLeft = 0;
+            this.gameOver = true;
+            return;
         }
+
+        // OGGETTI
+        if (this.random.nextDouble() < SPAWN_PROBABILITY) {
+            spawnObject();
+        }
+
+        // COLLISIONI
+        updateAndCheckCollisions();
     }
 
-    private void updateObjects() {
+    private void spawnObject() {
+        final double x = this.random.nextDouble() * (GAME_WIDTH - OBJ_SIZE);
+
+        final FallingObject.Type type;
+        final double chance = this.random.nextDouble();
+
+        if (chance < BOMB_CHANCE_THRESHOLD) {
+            type = FallingObject.Type.BOMB;
+        } else if (chance < BANANA_CHANCE_THRESHOLD) {
+            type = FallingObject.Type.BANANA;
+        } else {
+            type = FallingObject.Type.APPLE;
+        }
+
+        this.fallingObjects.add(new FallingObject(x, 0, type, OBJ_SIZE, OBJ_SIZE));
+    }
+
+    private void updateAndCheckCollisions() {
         final Iterator<FallingObject> iterator = this.fallingObjects.iterator();
+
         while (iterator.hasNext()) {
             final FallingObject obj = iterator.next();
+
             obj.fall(GRAVITY);
 
-            if (obj.getY() > GAME_HEIGHT) {
-                iterator.remove();
-            }
-        }
-    }
+            final boolean hitX = Math.abs(obj.getX() - this.pouX) < (PLAYER_SIZE / HITBOX_TOLERANCE_FACTOR);
+            final boolean hitY = obj.getY() > PLAYER_Y_POS && obj.getY() < PLAYER_Y_POS + PLAYER_SIZE;
 
-    private void checkCollisions() {
-        final Iterator<FallingObject> iterator = this.fallingObjects.iterator();
-        while (iterator.hasNext()) {
-            final FallingObject obj = iterator.next();
-            if (isColliding(obj)) {
+            if (hitX && hitY) {
                 if (obj.isBomb()) {
                     this.gameOver = true;
                 } else {
                     this.score += obj.getValue();
                 }
                 iterator.remove();
+            } else if (obj.getY() > GAME_HEIGHT) {
+                iterator.remove();
             }
         }
-    }
-
-    private boolean isColliding(final FallingObject obj) {
-        return obj.getX() < this.playerX + PLAYER_SIZE
-                && obj.getX() + obj.getWidth() > this.playerX
-                && obj.getY() < PLAYER_Y_POS + PLAYER_SIZE
-                && obj.getY() + obj.getHeight() > PLAYER_Y_POS;
     }
 
     @Override
@@ -111,31 +132,42 @@ public final class FruitCatcherGame implements Minigame {
 
     @Override
     public int calculateCoins() {
-        return this.score / COIN_CONVERSION_RATE;
+        return this.score;
     }
 
     /**
-     * Updates the player's horizontal position.
+     * Sets the player horizontal position.
      *
-     * @param x the new x position
+     * @param x the new x position.
      */
     public void setPlayerPosition(final double x) {
-        this.playerX = x;
+        if (x < 0) {
+            this.pouX = 0;
+        } else if (x > GAME_WIDTH - PLAYER_BOUNDARY_OFFSET) {
+            this.pouX = GAME_WIDTH - PLAYER_BOUNDARY_OFFSET;
+        } else {
+            this.pouX = x;
+        }
     }
 
     /**
-     * Returns a safe copy of the falling objects for the view.
-     *
-     * @return the list of falling objects.
+     * @return current player X position.
+     */
+    public double getPlayerX() {
+        return this.pouX;
+    }
+
+    /**
+     * @return unmodifiable list of falling objects.
      */
     public List<FallingObject> getFallingObjects() {
         return Collections.unmodifiableList(this.fallingObjects);
     }
 
     /**
-     * @return the current X position of the player.
+     * @return remaining time in seconds.
      */
-    public double getPlayerX() {
-        return this.playerX;
+    public double getTimeLeft() {
+        return this.timeLeft;
     }
 }
