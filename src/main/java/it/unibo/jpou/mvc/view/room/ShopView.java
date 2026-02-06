@@ -1,117 +1,118 @@
 package it.unibo.jpou.mvc.view.room;
 
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Node;
+import it.unibo.jpou.mvc.model.items.Item;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.StackPane;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
- * View responsible for displaying the in-game Shop.
+ * View for the Shop.
  */
 public final class ShopView extends AbstractRoomView {
 
-    private static final double GAP = 15.0;
-
-    // Components
-    private final FlowPane itemsContainer;
-    private final Button backButton;
     private final Label feedbackLabel;
-    private final Label titleLabel;
+    private final Button browseButton;
+    private final Button buyButton;
+
+    private List<Item> availableItems;
+    private Map<Item, Integer> priceMap;
+    private int currentIndex = -1;
+    private Item currentSelectedItem;
+    private Consumer<Item> onBuyAction;
 
     /**
-     * Initializes the shop interface.
+     * Initializes the Shop View layout.
      */
     public ShopView() {
-        super("/style/room/styleShopView.css");
+        super("Shop");
+
+        this.getStylesheets().add(
+                Objects.requireNonNull(getClass().getResource("/style/room/styleShopView.css"))
+                        .toExternalForm());
+        this.getStylesheets().add(
+                Objects.requireNonNull(getClass().getResource("/style/room/defaultRoom.css"))
+                        .toExternalForm());
         this.getStyleClass().add("shop-view");
 
-        final BorderPane layout = new BorderPane();
+        final StackPane centerLayout = new StackPane();
 
-        final VBox headerBox = new VBox(5);
-        headerBox.setAlignment(Pos.CENTER);
-        headerBox.setPadding(new Insets(10));
+        this.feedbackLabel = new Label("Welcome to Shop");
+        this.feedbackLabel.getStyleClass().add("feedback-label");
 
-        this.titleLabel = new Label("MARKETPLACE");
-        this.titleLabel.getStyleClass().add("shop-title");
+        centerLayout.getChildren().add(feedbackLabel);
+        this.getChildren().add(centerLayout);
 
-        this.feedbackLabel = new Label("Welcome! Spend your coins wisely.");
-        this.feedbackLabel.getStyleClass().add("shop-feedback-label");
+        this.browseButton = new Button("Browse");
+        this.browseButton.getStyleClass().add("action-button");
 
-        headerBox.getChildren().addAll(this.titleLabel, this.feedbackLabel);
-        layout.setTop(headerBox);
+        this.buyButton = new Button("Buy");
+        this.buyButton.getStyleClass().add("action-button");
 
-        this.itemsContainer = new FlowPane();
-        this.itemsContainer.setAlignment(Pos.TOP_CENTER);
-        this.itemsContainer.setHgap(GAP);
-        this.itemsContainer.setVgap(GAP);
-        this.itemsContainer.setPadding(new Insets(10));
-        this.itemsContainer.getStyleClass().add("items-container");
-        this.itemsContainer.prefWidthProperty().bind(layout.widthProperty());
+        this.browseButton.setOnAction(_ -> scrollNextItem());
+        this.buyButton.setOnAction(_ -> triggerBuy());
 
-        final ScrollPane scrollPane = new ScrollPane(itemsContainer);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        scrollPane.getStyleClass().add("shop-scroll-pane");
+        this.getActionBar().getChildren().addAll(this.browseButton, this.buyButton);
 
-        layout.setCenter(scrollPane);
-
-        final VBox bottomBox = new VBox(10);
-        bottomBox.setAlignment(Pos.CENTER);
-        bottomBox.setPadding(new Insets(10));
-        bottomBox.getStyleClass().add("shop-bottom-panel");
-
-        this.backButton = new Button("Back to Room");
-        this.backButton.getStyleClass().add("shop-back-button");
-
-        bottomBox.getChildren().add(this.backButton);
-        layout.setBottom(bottomBox);
-
-        this.getChildren().add(layout);
+        this.availableItems = new ArrayList<>();
+        this.priceMap = new HashMap<>();
     }
 
     /**
-     * Adds a new item component to the shop display.
+     * Receives the catalog data from the Controller.
      *
-     * @param itemNode the graphical node representing the shop item (Product Card).
+     * @param catalog The map of Items and Prices.
+     * @param onBuy The action to execute when buying.
      */
-    public void addItem(final Node itemNode) {
-        this.itemsContainer.getChildren().add(itemNode);
+    public void populateShop(final Map<Item, Integer> catalog, final Consumer<Item> onBuy) {
+        this.priceMap = new HashMap<>(catalog);
+        this.availableItems = new ArrayList<>(catalog.keySet());
+        this.onBuyAction = onBuy;
+
+        this.currentIndex = -1;
+        this.currentSelectedItem = null;
+        this.feedbackLabel.setText("Click 'Browse' to see items");
+    }
+
+    private void scrollNextItem() {
+        if (this.availableItems.isEmpty()) {
+            this.feedbackLabel.setText("Shop Empty");
+            return;
+        }
+
+        this.currentIndex = (this.currentIndex + 1) % this.availableItems.size();
+
+        this.currentSelectedItem = this.availableItems.get(this.currentIndex);
+        final int price = this.priceMap.get(this.currentSelectedItem);
+
+        final String name = this.currentSelectedItem.getClass().getSimpleName().toUpperCase(Locale.ROOT);
+        this.feedbackLabel.setText(name + " (" + price + "$)");
+    }
+
+    private void triggerBuy() {
+        if (this.currentSelectedItem == null) {
+            this.feedbackLabel.setText("Select an item first!");
+            return;
+        }
+
+        if (this.onBuyAction != null) {
+            this.onBuyAction.accept(this.currentSelectedItem);
+        }
     }
 
     /**
-     * Clears all items from the shop display.
-     */
-    public void clearItems() {
-        this.itemsContainer.getChildren().clear();
-    }
-
-    /**
-     * Updates the feedback message for the user.
+     * Updates the central label.
      *
-     * @param message the text to show.
+     * @param message text to show.
      */
     public void setFeedbackText(final String message) {
         this.feedbackLabel.setText(message);
-    }
-
-    /**
-     * Sets the action for the back button.
-     *
-     * @param handler the event handler.
-     */
-    public void setOnBackAction(final EventHandler<ActionEvent> handler) {
-        this.backButton.setOnAction(handler);
-    }
-
-    public Button getBackButton() {
-        return this.backButton;
     }
 }
