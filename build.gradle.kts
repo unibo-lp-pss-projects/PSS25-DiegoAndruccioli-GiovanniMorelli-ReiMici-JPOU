@@ -16,19 +16,24 @@ java {
     }
 }
 
+val javaFxVersion = "23.0.2"
+val javaFXModules = listOf("base", "controls", "fxml", "swing", "graphics")
+// Platforms to support: standard ones + mac-aarch64 (M1/M2/M3)
+val supportedPlatforms = listOf("linux", "mac", "win")
+
 dependencies {
     compileOnly("com.github.spotbugs:spotbugs-annotations:4.9.8")
 
-    val javaFxVersion = "23.0.2"
-    val javaFxPlatform = "mac-aarch64"
-
-    implementation("org.openjfx:javafx-base:$javaFxVersion:$javaFxPlatform")
-    implementation("org.openjfx:javafx-controls:$javaFxVersion:$javaFxPlatform")
-    implementation("org.openjfx:javafx-fxml:$javaFxVersion:$javaFxPlatform")
-    implementation("org.openjfx:javafx-swing:$javaFxVersion:$javaFxPlatform")
-    implementation("org.openjfx:javafx-graphics:$javaFxVersion:$javaFxPlatform")
-
-    implementation("org.openjfx:javafx-controls:$javaFxVersion")
+    // Add JavaFX dependencies for all supported platforms
+    for (platform in supportedPlatforms) {
+        for (module in javaFXModules) {
+            implementation("org.openjfx:javafx-$module:$javaFxVersion:$platform")
+        }
+    }
+    // Explicitly add Mac Aarch64 support (Apple Silicon)
+    for (module in javaFXModules) {
+        implementation("org.openjfx:javafx-$module:$javaFxVersion:mac-aarch64")
+    }
 
     testImplementation(platform("org.junit:junit-bom:6.0.2"))
     testImplementation("org.junit.jupiter:junit-jupiter")

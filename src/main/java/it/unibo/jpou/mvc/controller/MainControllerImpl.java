@@ -3,12 +3,12 @@ package it.unibo.jpou.mvc.controller;
 import it.unibo.jpou.mvc.controller.minigames.FruitCatcherController;
 import it.unibo.jpou.mvc.controller.minigames.FruitCatcherControllerImpl;
 import it.unibo.jpou.mvc.model.PouLogic;
+import it.unibo.jpou.mvc.model.PouState;
+import it.unibo.jpou.mvc.model.PouStatistics;
+import it.unibo.jpou.mvc.model.Room;
 import it.unibo.jpou.mvc.model.inventory.Inventory;
 import it.unibo.jpou.mvc.model.inventory.InventoryImpl;
 import it.unibo.jpou.mvc.view.MainView;
-import it.unibo.jpou.mvc.view.minigames.FruitCatcherJavaFXView;
-import it.unibo.jpou.mvc.view.minigames.FruitCatcherView;
-import javafx.application.Platform;
 
 import java.util.Objects;
 import java.util.logging.Logger;
@@ -16,7 +16,8 @@ import java.util.logging.Logger;
 /**
  * Implementation of the Main Controller acting as the Logic Orchestrator.
  * This class is responsible for wiring the Business Logic components together.
- * It manages the lifecycle of the application and holds references to the core controllers.
+ * It manages the lifecycle of the application and holds references to the core
+ * controllers.
  */
 public final class MainControllerImpl implements MainController {
 
@@ -30,6 +31,10 @@ public final class MainControllerImpl implements MainController {
     private final InventoryController inventoryController;
 
     private final GameLoop gameLoop;
+    private final MainView mainView;
+
+    private final BedroomView bedroomView;
+    private final BathroomView bathroomView;
 
     //per scalabilita minigame
     private FruitCatcherController activeMinigame;
@@ -37,9 +42,12 @@ public final class MainControllerImpl implements MainController {
     /**
      * Constructs the logical system and wires dependencies.
      *
+     * @param view The main view instance (Present for compatibility, but currently
+     *             ignored).
      * @param view The main view instance.
      */
     public MainControllerImpl(final MainView view) {
+
         this.view = Objects.requireNonNull(view, "View cannot be null.");
 
         this.model = new PouLogic();
@@ -47,10 +55,72 @@ public final class MainControllerImpl implements MainController {
 
         this.shopController = new ShopControllerImpl(this.model, this.inventory);
         this.inventoryController = new InventoryControllerImpl(this.model, this.inventory);
+        this.gameLoop = new PouGameLoop();
 
-        final PouGameLoop loop = new PouGameLoop();
-        this.gameLoop = loop;
+        this.bedroomView = new BedroomView();
+        this.bathroomView = new BathroomView();
 
+        setupBedroomLogic();
+        setupBathroomLogic();
+        setupNavigation();
+        setupGameLoop();
+
+        this.mainView.setRoom(this.bedroomView);
+
+        LOGGER.info("[MainController] Logic System initialized.");
+    }
+
+    private void setupBedroomLogic() {
+        this.model.stateProperty().addListener((_, _, newState) ->
+                Platform.runLater(() -> this.bedroomView.updateView(newState)));
+
+        this.bedroomView.setOnActionHandler(_ -> {
+            if (this.model.getState() == PouState.SLEEPING) {
+                this.model.wakeUp();
+            } else {
+                this.model.sleep();
+            }
+        });
+
+        this.bedroomView.setOnInventoryHandler(_ -> {
+            LOGGER.info("Open wardrobe devi mettere l'azione di guardarobe");
+        });
+    }
+
+    private void setupBathroomLogic() {
+        this.bathroomView.setOnWashHandler(_ -> {
+            this.model.wash();
+            updateGlobalStatistics();
+        });
+    }
+
+    private void setupNavigation() {
+        this.mainView.setOnRoomChange(Room.BEDROOM, _ -> this.mainView.setRoom(this.bedroomView));
+        this.mainView.setOnRoomChange(Room.BATHROOM, _ -> this.mainView.setRoom(this.bathroomView));
+    }
+
+    private void setupGameLoop() {
+        if (this.gameLoop instanceof PouGameLoop) {
+            ((PouGameLoop) this.gameLoop).addTickListener(() -> {
+                this.model.applyDecay();
+                Platform.runLater(this::updateGlobalStatistics);
+            });
+        }
+    }
+
+    private void updateGlobalStatistics() {
+        this.mainView.updateStat("hunger",
+                (double) this.model.getHunger() / PouStatistics.STATISTIC_MAX_VALUE,
+                String.valueOf(this.model.getHunger()));
+        this.mainView.updateStat("energy",
+                (double) this.model.getEnergy() / PouStatistics.STATISTIC_MAX_VALUE,
+                String.valueOf(this.model.getEnergy()));
+        this.mainView.updateStat("fun",
+                (double) this.model.getFun() / PouStatistics.STATISTIC_MAX_VALUE,
+                String.valueOf(this.model.getFun()));
+        this.mainView.updateStat("health",
+                (double) this.model.getHealth() / PouStatistics.STATISTIC_MAX_VALUE,
+                String.valueOf(this.model.getHealth()));
         LOGGER.info("[MainController] Logic System initialized.");
     }
 
