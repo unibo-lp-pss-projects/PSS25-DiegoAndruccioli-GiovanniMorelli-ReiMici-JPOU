@@ -2,6 +2,7 @@ package it.unibo.jpou.mvc.view.component;
 
 import it.unibo.jpou.mvc.view.character.PouCharacterView;
 import it.unibo.jpou.mvc.view.room.AbstractRoomView;
+import javafx.beans.property.IntegerProperty;
 import javafx.scene.layout.StackPane;
 
 /**
@@ -52,5 +53,14 @@ public final class CenterContainerComponent extends StackPane {
      */
     public void setPouSleeping(final boolean sleeping) {
         this.characterView.setSleeping(sleeping);
+    }
+
+    /**
+     * Binds the character size to the logic age.
+     *
+     * @param ageProperty the property representing the age of the character.
+     */
+    public void bindPouSize(final IntegerProperty ageProperty) {
+        this.characterView.bindSize(ageProperty);
     }
 }

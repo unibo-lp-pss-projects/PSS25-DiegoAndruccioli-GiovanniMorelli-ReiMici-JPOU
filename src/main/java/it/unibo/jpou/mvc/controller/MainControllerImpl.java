@@ -79,6 +79,9 @@ public final class MainControllerImpl implements MainController {
         setupGameRoomLogic();
         setupNavigation();
         setupGameLoop();
+
+        this.mainView.bindPouAge(this.model.ageProperty());
+
         this.mainView.setRoom(this.bedroomView);
         //this.mainView.setRoom(this.gameRoomView);
         LOGGER.info("[MainController] Logic System initialized.");

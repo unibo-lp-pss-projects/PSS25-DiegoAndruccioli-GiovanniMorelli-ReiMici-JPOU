@@ -3,6 +3,7 @@ package it.unibo.jpou.mvc.model.decay;
 import it.unibo.jpou.mvc.model.PouState;
 import it.unibo.jpou.mvc.model.PouStatistics;
 import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.IntegerProperty;
 
 /**
  * Handles the automatic decay of Pou's statistics over time.
@@ -15,6 +16,8 @@ public final class PouStatisticsDecay {
     private static final int REGENERATION_HEALTH = 3;
     private static final int HEALTH_PENALITY = 10;
 
+    private static final int MAX_AGE = 720;
+
     /**
      * Performs decay logic on the provided statistics.
      *
@@ -23,14 +26,24 @@ public final class PouStatisticsDecay {
      * @param fun    statistic to modify
      * @param health statistic to modify
      * @param state  statistic to modify
+     * @param age    property to increment
      */
     public void performDecay(final PouStatistics hunger,
             final PouStatistics energy,
             final PouStatistics fun,
             final PouStatistics health,
-            final ReadOnlyObjectProperty<PouState> state) {
+            final ReadOnlyObjectProperty<PouState> state,
+            final IntegerProperty age) {
 
         if (state.get() == PouState.DEAD) {
+            return;
+        }
+
+        final int currentAge = age.get();
+        age.set(currentAge + 1);
+
+        if (age.get() >= MAX_AGE) {
+            health.setValueStat(0);
             return;
         }
 

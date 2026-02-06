@@ -6,7 +6,9 @@ import it.unibo.jpou.mvc.model.statistics.EnergyStatistic;
 import it.unibo.jpou.mvc.model.statistics.FunStatistic;
 import it.unibo.jpou.mvc.model.statistics.HealthStatistic;
 import it.unibo.jpou.mvc.model.statistics.HungerStatistic;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +23,7 @@ class PouStatisticsDecayTest {
     private FunStatistic fun;
     private HealthStatistic health;
     private ObjectProperty<PouState> state;
+    private IntegerProperty age;
     private PouStatisticsDecay statisticsDecay;
 
     @BeforeEach
@@ -30,6 +33,7 @@ class PouStatisticsDecayTest {
         fun = new FunStatistic();
         health = new HealthStatistic();
         state = new SimpleObjectProperty<>(PouState.AWAKE);
+        age = new SimpleIntegerProperty(0);
         statisticsDecay = new PouStatisticsDecay();
     }
 
@@ -41,7 +45,7 @@ class PouStatisticsDecayTest {
         health.setValueStat(PouStatistics.STATISTIC_MAX_VALUE);
         state.set(PouState.AWAKE);
 
-        statisticsDecay.performDecay(this.hunger, this.energy, this.fun, this.health, this.state);
+        statisticsDecay.performDecay(this.hunger, this.energy, this.fun, this.health, this.state, this.age);
 
         assertAll("Tutte le statistiche devono decadere",
                 () -> assertTrue(hunger.getValueStat() < PouStatistics.STATISTIC_MAX_VALUE),
@@ -58,7 +62,7 @@ class PouStatisticsDecayTest {
         health.setValueStat(PouStatistics.STATISTIC_INITIAL_VALUE);
         state.set(PouState.SLEEPING);
 
-        statisticsDecay.performDecay(this.hunger, this.energy, this.fun, this.health, this.state);
+        statisticsDecay.performDecay(this.hunger, this.energy, this.fun, this.health, this.state, this.age);
 
         assertAll("Il decadimento delle statistiche mentre dorme",
                 () -> assertTrue(hunger.getValueStat() < PouStatistics.STATISTIC_INITIAL_VALUE),
@@ -79,7 +83,7 @@ class PouStatisticsDecayTest {
 
         final int initialHealth = health.getValueStat();
 
-        statisticsDecay.performDecay(this.hunger, this.energy, this.fun, this.health, this.state);
+        statisticsDecay.performDecay(this.hunger, this.energy, this.fun, this.health, this.state, this.age);
 
         assertTrue(health.getValueStat() < initialHealth,
                 "La salute deve diminuire se una delle altre statistiche è a 0");

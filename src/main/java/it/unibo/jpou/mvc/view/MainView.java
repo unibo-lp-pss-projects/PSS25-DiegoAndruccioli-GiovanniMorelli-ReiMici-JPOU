@@ -7,6 +7,7 @@ import it.unibo.jpou.mvc.view.component.TopBarComponent;
 import it.unibo.jpou.mvc.view.overlay.GameOverOverlayView;
 import it.unibo.jpou.mvc.view.overlay.PauseOverlayView;
 import it.unibo.jpou.mvc.view.room.AbstractRoomView;
+import javafx.beans.property.IntegerProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Parent;
@@ -51,6 +52,15 @@ public final class MainView extends StackPane {
         this.gameOverOverlay.setVisible(false);
 
         this.getChildren().addAll(mainLayout, this.pauseOverlay, this.gameOverOverlay);
+    }
+
+    /**
+     * Binds the Pou character size to the logic age property.
+     *
+     * @param ageProperty the property representing Pou's age.
+     */
+    public void bindPouAge(final IntegerProperty ageProperty) {
+        this.centerContainer.bindPouSize(ageProperty);
     }
 
     /**

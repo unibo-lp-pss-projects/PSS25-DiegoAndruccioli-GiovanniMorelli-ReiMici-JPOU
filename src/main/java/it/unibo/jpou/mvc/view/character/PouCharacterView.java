@@ -15,6 +15,7 @@ public final class PouCharacterView extends Group {
 
     private static final double BODY_RX = 70.0;
     private static final double BODY_RY = 60.0;
+
     private static final double MIN_SCALE = 0.5;
     private static final double MAX_SCALE = 2.0;
     private static final double MAX_AGE_REF = 720.0;
