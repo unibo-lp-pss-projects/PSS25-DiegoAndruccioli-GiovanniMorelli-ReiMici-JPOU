@@ -54,3 +54,9 @@
 .shop-link-button {
     -fx-font-size: 14px;
 }
+
+.selected-food-label {
+    -fx-font-size: 28px;
+    -fx-text-fill: #333333;
+    -fx-font-weight: bold;
+}
