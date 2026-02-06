@@ -7,7 +7,7 @@ import it.unibo.jpou.mvc.model.items.consumable.AbstractConsumable;
  */
 public final class Apple extends AbstractConsumable implements Food {
 
-    private static final String APPLE_NAME = "Apple";
+    public static final String APPLE_NAME = "Apple";
     private static final int APPLE_PRICE = 5;
     private static final int APPLE_EFFECT = 10;
 

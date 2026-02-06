@@ -7,7 +7,7 @@ import it.unibo.jpou.mvc.model.items.consumable.AbstractConsumable;
  */
 public final class EnergyPotion extends AbstractConsumable implements Potion {
 
-    private static final String POTION_NAME = "Energy Potion";
+    public static final String POTION_NAME = "Energy Potion";
     private static final int POTION_PRICE = 20;
     private static final int POTION_EFFECT = 30;
 

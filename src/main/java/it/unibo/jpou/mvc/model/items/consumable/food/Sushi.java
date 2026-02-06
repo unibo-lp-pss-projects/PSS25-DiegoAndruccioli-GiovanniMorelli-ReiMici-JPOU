@@ -7,7 +7,7 @@ import it.unibo.jpou.mvc.model.items.consumable.AbstractConsumable;
  */
 public final class Sushi extends AbstractConsumable implements Food {
 
-    private static final String SUSHI_NAME = "Sushi";
+    public static final String SUSHI_NAME = "Sushi";
     private static final int SUSHI_PRICE = 25;
     private static final int SUSHI_EFFECT = 40;
 
