@@ -21,4 +21,18 @@ public interface MainController {
      * Starts the Fruit Catcher minigame.
      */
     void startFruitCatcher();
+
+    /**
+     * Returns the controller responsible for the Shop logic.
+     *
+     * @return the shop controller instance.
+     */
+    ShopController getShopController();
+
+    /**
+     * Returns the controller responsible for Inventory logic.
+     *
+     * @return the inventory controller instance.
+     */
+    InventoryController getInventoryController();
 }

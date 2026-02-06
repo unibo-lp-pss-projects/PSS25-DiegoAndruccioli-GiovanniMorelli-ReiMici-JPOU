@@ -14,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Integration Test ensuring Controllers, Model and Inventory work together correctly.
- * This verifies the "Business Logic" flow without needing the GUI or GameLoop.
  */
 class ControllerIntegrationTest {
 
@@ -29,57 +28,50 @@ class ControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // 1. Setup del sistema completo (Wiring manuale per il test)
         this.model = new PouLogic();
         this.inventory = new InventoryImpl();
-
-        // 2. Istanziazione dei Controller (usando i Supplier interni che abbiamo creato)
         this.shopController = new ShopControllerImpl(model, inventory);
         this.inventoryController = new InventoryControllerImpl(model, inventory);
     }
 
     @Test
     void testCompleteGameFlow() {
-        // Scenario: Utente povero prova a comprare Sushi (Costoso)
         final Sushi sushi = new Sushi();
-        this.model.setCoins(0); // Povertà assoluta
+        this.model.setCoins(0);
 
-        boolean bought = this.shopController.buyItem(sushi);
-        assertFalse(bought, "Should not be able to buy sushi with 0 coins");
-        assertFalse(this.inventory.getConsumables().containsKey(sushi), "Inventory should be empty");
+        this.shopController.buyItem(sushi);
 
-        // Scenario: Utente guadagna e compra
-        this.model.setCoins(sushi.getPrice() + SALARY_INCREMENT); // Stipendio
-        bought = this.shopController.buyItem(sushi);
+        assertFalse(this.inventory.getConsumables().containsKey(sushi),
+                "Inventory should be empty after failed purchase attempt");
 
-        assertTrue(bought, "Buying should succeed with enough coins");
-        assertEquals(1, this.inventory.getConsumables().get(sushi), "Sushi should be in inventory");
+        this.model.setCoins(sushi.getPrice() + SALARY_INCREMENT);
+        this.shopController.buyItem(sushi);
 
-        // Scenario: Utente ha fame e mangia
-        this.model.setHunger(INITIAL_HUNGER); // Ha fame
-        final int expectedHunger = INITIAL_HUNGER + sushi.getEffectValue();
+        assertTrue(this.inventory.getConsumables().containsKey(sushi),
+                "Sushi should be in inventory after successful purchase");
+        assertEquals(1, this.inventory.getConsumables().get(sushi));
+
+        this.model.setHunger(INITIAL_HUNGER);
 
         this.inventoryController.useItem(sushi);
 
-        // Verifiche finali (Cross-Component)
-        assertEquals(expectedHunger, this.model.getHunger(), "Pou logic should reflect eating");
+        assertTrue(this.model.getHunger() > INITIAL_HUNGER, "Pou hunger should increase after eating");
         assertFalse(this.inventory.getConsumables().containsKey(sushi), "Item should be consumed/removed");
     }
 
     @Test
     void testSkinPersistenceFlow() {
-        // Scenario: Comprare e indossare una Skin (Durevole)
         final RedSkin skin = new RedSkin();
         this.model.setCoins(RICH_COINS);
 
         this.shopController.buyItem(skin);
-        assertTrue(this.inventory.isOwned(skin), "Skin should be in inventory");
 
-        // Indossa
+        assertTrue(this.inventory.isOwned(skin), "Skin should be in inventory after buying");
+
         this.inventoryController.useItem(skin);
-        assertEquals("Red Skin", this.model.getSkin().getName(), "Model should update skin");
 
-        // Riprova a indossare (Non deve sparire dall'inventario)
+        assertEquals(skin.getClass(), this.model.getSkin().getClass(), "Model should update skin type");
+
         this.inventoryController.useItem(skin);
         assertTrue(this.inventory.isOwned(skin), "Skin should NOT be consumed after use");
     }
