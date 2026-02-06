@@ -5,7 +5,7 @@ package it.unibo.jpou.mvc.model.items.durable.skin;
  */
 public class RedSkin implements Skin {
 
-    private static final String SKIN_NAME = "Red Skin";
+    public static final String SKIN_NAME = "Red Skin";
     private static final int SKIN_PRICE = 50;
     private static final String SKIN_COLOR = "#FF0000";
 

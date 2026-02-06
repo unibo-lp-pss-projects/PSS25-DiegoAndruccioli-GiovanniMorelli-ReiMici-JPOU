@@ -6,7 +6,7 @@ package it.unibo.jpou.mvc.model.items.durable.skin;
  */
 public class DefaultSkin implements Skin {
 
-    private static final String DEFAULT_NAME = "Default";
+    public static final String DEFAULT_NAME = "Default";
     private static final int DEFAULT_PRICE = 0;
     private static final String DEFAULT_COLOR = "#E3C072";
 
