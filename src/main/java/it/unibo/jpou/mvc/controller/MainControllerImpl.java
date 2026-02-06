@@ -19,6 +19,7 @@ import it.unibo.jpou.mvc.view.room.KitchenView;
 import it.unibo.jpou.mvc.view.room.ShopView;
 import it.unibo.jpou.mvc.view.room.GameRoomView;
 import javafx.application.Platform;
+import it.unibo.jpou.mvc.view.character.PouCharacterView;
 
 import java.util.HashMap;
 import java.util.Objects;
@@ -167,7 +168,9 @@ public final class MainControllerImpl implements MainController {
         //ferma loop principale
         this.gameLoop.shutdown();
 
-        final FruitCatcherView minigameView = new FruitCatcherJavaFXView();
+        final PouCharacterView pouView = this.mainView.getPouCharacterView();
+
+        final FruitCatcherView minigameView = new FruitCatcherJavaFXView(pouView);
 
         this.activeMinigame = new FruitCatcherControllerImpl(minigameView, coins -> {
             LOGGER.info("Minigame finished. Coins won: " + coins);
@@ -188,6 +191,8 @@ public final class MainControllerImpl implements MainController {
     private void closeMinigame(final FruitCatcherView minigameView) {
         Platform.runLater(() -> {
             this.mainView.removeMinigame(minigameView.getNode());
+
+            this.mainView.restoreCharacter();
 
             this.activeMinigame = null;
 
