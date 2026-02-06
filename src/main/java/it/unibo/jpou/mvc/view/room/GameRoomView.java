@@ -26,6 +26,7 @@ public final class GameRoomView extends AbstractRoomView {
 
         this.fruitCatcherButton = new Button("Fruit Catcher");
 
+        this.fruitCatcherButton.getStyleClass().add("action-button");
         this.getActionBar().getChildren().addAll(
                 this.fruitCatcherButton
         );
