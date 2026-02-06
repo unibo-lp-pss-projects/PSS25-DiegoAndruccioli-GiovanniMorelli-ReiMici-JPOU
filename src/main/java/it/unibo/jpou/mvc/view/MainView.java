@@ -150,4 +150,13 @@ public final class MainView extends StackPane {
     public void setCharacterVisible(final boolean visible) {
         this.centerContainer.setCharacterVisible(visible);
     }
+
+    /**
+     * Updates the character visuals for sleeping state.
+     *
+     * @param sleeping true if Pou is sleeping
+     */
+    public void setPouSleeping(final boolean sleeping) {
+        this.centerContainer.setPouSleeping(sleeping);
+    }
 }

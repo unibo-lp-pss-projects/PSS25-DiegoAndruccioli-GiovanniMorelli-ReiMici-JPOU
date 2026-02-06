@@ -1,7 +1,7 @@
 package it.unibo.jpou.mvc.controller;
 
-import it.unibo.jpou.mvc.controller.minigames.FruitCatcherController;
-import it.unibo.jpou.mvc.controller.minigames.FruitCatcherControllerImpl;
+import it.unibo.jpou.mvc.controller.room.BathroomController;
+import it.unibo.jpou.mvc.controller.room.BedroomController;
 import it.unibo.jpou.mvc.model.PouLogic;
 import it.unibo.jpou.mvc.model.PouState;
 import it.unibo.jpou.mvc.model.PouStatistics;
@@ -9,8 +9,8 @@ import it.unibo.jpou.mvc.model.Room;
 import it.unibo.jpou.mvc.model.inventory.Inventory;
 import it.unibo.jpou.mvc.model.inventory.InventoryImpl;
 import it.unibo.jpou.mvc.view.MainView;
-import it.unibo.jpou.mvc.view.minigames.FruitCatcherJavaFXView;
-import it.unibo.jpou.mvc.view.minigames.FruitCatcherView;
+import it.unibo.jpou.mvc.view.room.AbstractRoomView;
+import it.unibo.jpou.mvc.view.room.BathroomView;
 import it.unibo.jpou.mvc.view.room.BedroomView;
 import it.unibo.jpou.mvc.view.room.BathroomView;
 import it.unibo.jpou.mvc.view.room.GameRoomView;
@@ -30,7 +30,6 @@ public final class MainControllerImpl implements MainController {
 
     private static final Logger LOGGER = Logger.getLogger(MainControllerImpl.class.getName());
 
-    private final MainView view;
     private final PouLogic model;
     private final Inventory inventory;
 
@@ -39,6 +38,7 @@ public final class MainControllerImpl implements MainController {
 
     private final GameLoop gameLoop;
 
+    private final MainView mainView;
     private final BedroomView bedroomView;
     private final BathroomView bathroomView;
     private final KitchenView kitchenView;
@@ -53,15 +53,14 @@ public final class MainControllerImpl implements MainController {
      * @param view The main view instance (Present for compatibility, but currently
      *             ignored).
      */
+
     public MainControllerImpl(final MainView view) {
 
-        this.view = Objects.requireNonNull(view, "View cannot be null.");
+        this.mainView = Objects.requireNonNull(view, "View cannot be null");
 
         this.model = new PouLogic();
         this.inventory = new InventoryImpl();
 
-        this.shopController = new ShopControllerImpl(this.model, this.inventory);
-        this.inventoryController = new InventoryControllerImpl(this.model, this.inventory);
         this.gameLoop = new PouGameLoop();
 
         this.bedroomView = new BedroomView();
@@ -69,82 +68,74 @@ public final class MainControllerImpl implements MainController {
         this.kitchenView = new KitchenView();
         this.gameRoomView = new GameRoomView();
 
-        setupBedroomLogic();
-        setupBathroomLogic();
-        setupGameRoomLogic();
+        this.shopController = new ShopControllerImpl(this.model, this.inventory);
+        this.inventoryController = new InventoryControllerImpl(this.model, this.inventory);
+        new BathroomController(this.model, this.bathroomView, this::updateGlobalStatistics);
+        new BedroomController(this.model, this.bedroomView, this.mainView);
+
         setupNavigation();
         setupGameLoop();
 
-        this.view.setRoom(this.bedroomView);
+        this.mainView.setRoom(this.bedroomView);
 
         LOGGER.info("[MainController] Logic System initialized.");
     }
 
-    private void setupBedroomLogic() {
-        this.model.stateProperty().addListener((_, _, newState) ->
-                Platform.runLater(() -> this.bedroomView.updateView(newState)));
-
-        this.bedroomView.setOnActionHandler(_ -> {
-            if (this.model.getState() == PouState.SLEEPING) {
-                this.model.wakeUp();
-            } else {
-                this.model.sleep();
-            }
-        });
-
-        this.bedroomView.setOnInventoryHandler(_ -> {
-            LOGGER.info("Open wardrobe devi mettere l'azione di guardarobe");
-        });
-    }
-
-    private void setupBathroomLogic() {
-        this.bathroomView.setOnWashHandler(_ -> {
-            this.model.wash();
-            updateGlobalStatistics();
-        });
-    }
-
-    private void setupGameRoomLogic() {
-        this.gameRoomView.setOnFruitCatcherAction(e -> this.startFruitCatcher());
-    }
-
     private void setupNavigation() {
-        this.view.setOnRoomChange(Room.BEDROOM, e -> this.view.setRoom(this.bedroomView));
-        this.view.setOnRoomChange(Room.BATHROOM, e -> this.view.setRoom(this.bathroomView));
-        this.view.setOnRoomChange(Room.KITCHEN, e -> this.view.setRoom(this.kitchenView));
-        this.view.setOnRoomChange(Room.GAME_ROOM, e -> this.view.setRoom(this.gameRoomView));
+        this.mainView.setOnRoomChange(Room.BEDROOM, _ -> changeRoom(this.bedroomView));
+        this.mainView.setOnRoomChange(Room.BATHROOM, _ -> changeRoom(this.bathroomView));
     }
 
     private void setupGameLoop() {
         if (this.gameLoop instanceof PouGameLoop) {
             ((PouGameLoop) this.gameLoop).addTickListener(() -> {
                 this.model.applyDecay();
+
                 Platform.runLater(this::updateGlobalStatistics);
             });
         }
     }
 
     private void updateGlobalStatistics() {
-        this.view.updateStat("hunger",
+        this.mainView.updateStat("hunger",
                 (double) this.model.getHunger() / PouStatistics.STATISTIC_MAX_VALUE,
                 String.valueOf(this.model.getHunger()));
-        this.view.updateStat("energy",
+        this.mainView.updateStat("energy",
                 (double) this.model.getEnergy() / PouStatistics.STATISTIC_MAX_VALUE,
                 String.valueOf(this.model.getEnergy()));
-        this.view.updateStat("fun",
+        this.mainView.updateStat("fun",
                 (double) this.model.getFun() / PouStatistics.STATISTIC_MAX_VALUE,
                 String.valueOf(this.model.getFun()));
-        this.view.updateStat("health",
+        this.mainView.updateStat("health",
                 (double) this.model.getHealth() / PouStatistics.STATISTIC_MAX_VALUE,
                 String.valueOf(this.model.getHealth()));
     }
 
+    /**
+     * Helper method to handle room switching logic.
+     * Automatically wakes up Pou if leaving the Bedroom.
+     *
+     * @param newRoomView the target room view
+     */
+    private void changeRoom(final AbstractRoomView newRoomView) {
+        if (!(newRoomView instanceof BedroomView) && this.model.getState() == PouState.SLEEPING) {
+            this.model.wakeUp();
+        }
+        this.mainView.setRoom(newRoomView);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void start() {
         this.gameLoop.start();
         LOGGER.info("[MainController] GameLoop started.");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void stop() {
         this.gameLoop.shutdown();
@@ -204,7 +195,10 @@ public final class MainControllerImpl implements MainController {
     }
 
     /**
-     * @return the inventory controller instance.
+     * Retrieves the inventory controller instance.
+     * Needed to expose business logic to tests or future view components.
+     *
+     * @return the inventory controller.
      */
     public InventoryController getInventoryController() {
         return this.inventoryController;

@@ -44,4 +44,13 @@ public final class CenterContainerComponent extends StackPane {
     public void setCharacterVisible(final boolean visible) {
         this.characterView.setVisible(visible);
     }
+
+    /**
+     * Updates the character's sleeping visuals.
+     *
+     * @param sleeping true to close eyes
+     */
+    public void setPouSleeping(final boolean sleeping) {
+        this.characterView.setSleeping(sleeping);
+    }
 }
