@@ -79,8 +79,8 @@ public final class MainControllerImpl implements MainController {
         setupGameRoomLogic();
         setupNavigation();
         setupGameLoop();
-        //this.mainView.setRoom(this.bedroomView);
-        this.mainView.setRoom(this.gameRoomView);
+        this.mainView.setRoom(this.bedroomView);
+        //this.mainView.setRoom(this.gameRoomView);
         LOGGER.info("[MainController] Logic System initialized.");
     }
 
