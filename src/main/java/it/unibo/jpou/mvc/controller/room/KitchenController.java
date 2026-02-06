@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 
 /**
  * Controller dedicated to the Kitchen logic.
- * Handles the eating action and updates the food inventory view.
  */
 public final class KitchenController {
 
@@ -29,9 +28,9 @@ public final class KitchenController {
      * @param model              The game logic model.
      * @param inventory          The player's inventory.
      * @param view               The view specific to the kitchen.
-     * @param globalStatsUpdater A callback to update the top bar statistics in MainView.
+     * @param globalStatsUpdater A callback to update the top bar statistics.
      */
-    @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Dependency Injection requires storing mutable references")
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Dependency Injection")
     public KitchenController(final PouLogic model,
                              final Inventory inventory,
                              final KitchenView view,
@@ -42,19 +41,16 @@ public final class KitchenController {
         this.globalStatsUpdater = globalStatsUpdater;
 
         setupLogic();
+        refreshView();
     }
 
     private void setupLogic() {
         this.view.setOnEat(food -> {
             try {
                 this.model.eat(food);
-
                 this.inventory.consumeItem(food);
-
                 refreshView();
-
                 this.globalStatsUpdater.run();
-
                 LOGGER.info("Pou ate: " + food.getName());
             } catch (final IllegalArgumentException e) {
                 LOGGER.warning("Eat action failed: " + e.getMessage());
@@ -63,8 +59,9 @@ public final class KitchenController {
     }
 
     /**
-     * Refreshes the available food in the view based on current inventory.
-     * Filters the inventory to find only Food items.
+     * Refreshes the available food in the view based on the current inventory.
+     * This method filters the general inventory to retrieve only {@link Food} items
+     * and their quantities, then updates the {@link KitchenView} display.
      */
     public void refreshView() {
         final Map<Food, Integer> foodMap = this.inventory.getConsumables().entrySet().stream()

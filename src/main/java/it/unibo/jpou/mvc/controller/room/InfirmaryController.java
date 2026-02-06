@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 
 /**
  * Controller dedicated to the Infirmary logic.
- * Handles the potion usage and updates the potion inventory view.
  */
 public final class InfirmaryController {
 
@@ -31,7 +30,7 @@ public final class InfirmaryController {
      * @param view               The view specific to the infirmary.
      * @param globalStatsUpdater A callback to update the top bar statistics.
      */
-    @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Dependency Injection requires storing mutable references")
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Dependency Injection")
     public InfirmaryController(final PouLogic model,
                                final Inventory inventory,
                                final InfirmaryView view,
@@ -42,18 +41,16 @@ public final class InfirmaryController {
         this.globalStatsUpdater = globalStatsUpdater;
 
         setupLogic();
+        refreshView();
     }
 
     private void setupLogic() {
         this.view.setOnUsePotion(potion -> {
             try {
                 this.model.usePotion(potion);
-
                 this.inventory.consumeItem(potion);
-
                 refreshView();
                 this.globalStatsUpdater.run();
-
                 LOGGER.info("Pou used potion: " + potion.getName());
             } catch (final IllegalArgumentException e) {
                 LOGGER.warning("Potion action failed: " + e.getMessage());
@@ -62,8 +59,9 @@ public final class InfirmaryController {
     }
 
     /**
-     * Refreshes the available potions in the view based on current inventory.
-     * Filters the inventory to find only Potion items.
+     * Refreshes the available potions in the view based on the current inventory.
+     * This method filters the general inventory to retrieve only {@link Potion} items
+     * and their quantities, then updates the {@link InfirmaryView} display.
      */
     public void refreshView() {
         final Map<Potion, Integer> potionMap = this.inventory.getConsumables().entrySet().stream()

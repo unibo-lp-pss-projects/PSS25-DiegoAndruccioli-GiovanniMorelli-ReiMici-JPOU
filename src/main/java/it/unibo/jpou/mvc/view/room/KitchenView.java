@@ -8,7 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -20,103 +20,102 @@ import java.util.function.Consumer;
  */
 public final class KitchenView extends AbstractRoomView {
 
-    private static final int TOP_PADDING = 50;
-    private final Label feedbackLabel;
+    private static final int TOP_PADDING = 30;
+    private static final double SPACING = 10.0;
+    private static final String ACTION_BTN_STYLE = "action-button";
+
+    private final Label foodLabel;
     private final Button eatButton;
-    private final Button nextItemButton;
+    private final Button nextFoodButton;
 
     private List<Food> availableFood = new ArrayList<>();
-    private Map<Food, Integer> foodQuantities = new HashMap<>();
+    private Map<Food, Integer> currentFoodMap = Collections.emptyMap();
     private int currentIndex = -1;
-    private Food currentSelectedFood;
-
-    private Consumer<Food> onEatAction;
+    private Consumer<Food> onEatHandler;
 
     /**
-     * Initializes the kitchen layout.
+     * Initializes the Kitchen layout.
      */
     public KitchenView() {
         super("Kitchen");
-
         this.getStylesheets().add(Objects.requireNonNull(getClass()
                 .getResource("/style/room/styleKitchenView.css")).toExternalForm());
         this.getStylesheets().add(Objects.requireNonNull(getClass()
                 .getResource("/style/room/defaultRoom.css")).toExternalForm());
         this.getStyleClass().add("kitchen-view");
 
-        final VBox topContainer = new VBox();
+        final VBox topContainer = new VBox(SPACING);
         topContainer.setAlignment(Pos.CENTER);
         topContainer.setPadding(new Insets(TOP_PADDING, 0, 0, 0));
 
-        this.feedbackLabel = new Label("Fridge is empty.");
-        this.feedbackLabel.getStyleClass().add("selected-food-label");
+        final Label titleLabel = new Label("KITCHEN");
+        titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: black;");
 
-        topContainer.getChildren().add(feedbackLabel);
+        this.foodLabel = new Label("Empty");
+        this.foodLabel.getStyleClass().add("selected-item-label");
+
+        topContainer.getChildren().addAll(titleLabel, this.foodLabel);
         this.setTop(topContainer);
 
-        this.eatButton = new Button("EAT");
-        this.eatButton.getStyleClass().add("action-button");
-        this.eatButton.setDisable(true);
-
-        this.nextItemButton = new Button("NEXT ITEM");
-        this.nextItemButton.getStyleClass().add("action-button");
-
-        this.nextItemButton.setOnAction(_ -> scrollNextItem());
+        this.eatButton = new Button("Eat");
+        this.eatButton.getStyleClass().add(ACTION_BTN_STYLE);
         this.eatButton.setOnAction(_ -> triggerEat());
 
-        this.getActionBar().getChildren().addAll(this.eatButton, this.nextItemButton);
+        this.nextFoodButton = new Button("Next");
+        this.nextFoodButton.getStyleClass().add(ACTION_BTN_STYLE);
+        this.nextFoodButton.setOnAction(_ -> scrollNext());
+
+        this.getActionBar().getChildren().addAll(this.nextFoodButton, this.eatButton);
     }
 
     /**
-     * Refresh food list.
+     * Updates the food list and quantities.
      *
-     * @param foods map of foods.
+     * @param food the map of food items and their counts.
      */
-    public void refreshFood(final Map<Food, Integer> foods) {
-        this.foodQuantities = new HashMap<>(foods);
-        this.availableFood = new ArrayList<>(foods.keySet());
+    public void refreshFood(final Map<Food, Integer> food) {
+        this.currentFoodMap = food;
+        this.availableFood = new ArrayList<>(food.keySet());
 
         if (this.availableFood.isEmpty()) {
+            this.foodLabel.setText("Empty");
             this.currentIndex = -1;
-            this.currentSelectedFood = null;
-            this.feedbackLabel.setText("Fridge is empty.");
             this.eatButton.setDisable(true);
         } else {
-            if (this.currentIndex < 0 || this.currentIndex >= this.availableFood.size()) {
-                this.currentIndex = 0;
-            }
-            this.currentSelectedFood = this.availableFood.get(this.currentIndex);
+            this.currentIndex = 0;
             this.eatButton.setDisable(false);
             updateDisplay();
         }
     }
 
-    private void scrollNextItem() {
+    /**
+     * Sets the eat action handler.
+     *
+     * @param handler the consumer.
+     */
+    public void setOnEat(final Consumer<Food> handler) {
+        this.onEatHandler = handler;
+    }
+
+    private void scrollNext() {
         if (!this.availableFood.isEmpty()) {
             this.currentIndex = (this.currentIndex + 1) % this.availableFood.size();
-            this.currentSelectedFood = this.availableFood.get(this.currentIndex);
             updateDisplay();
         }
     }
 
-    private void updateDisplay() {
-        if (this.currentSelectedFood != null) {
-            final String name = this.currentSelectedFood.getName().toUpperCase(Locale.ROOT);
-            final int qty = this.foodQuantities.get(this.currentSelectedFood);
-            this.feedbackLabel.setText(name + " (x" + qty + ")");
-        }
-    }
-
     private void triggerEat() {
-        if (this.currentSelectedFood != null && this.onEatAction != null) {
-            this.onEatAction.accept(this.currentSelectedFood);
+        if (this.currentIndex >= 0 && !this.availableFood.isEmpty() && this.onEatHandler != null) {
+            this.onEatHandler.accept(this.availableFood.get(this.currentIndex));
         }
     }
 
-    /**
-     * @param listener action on eat.
-     */
-    public void setOnEat(final Consumer<Food> listener) {
-        this.onEatAction = listener;
+    private void updateDisplay() {
+        if (this.currentIndex >= 0 && this.currentIndex < this.availableFood.size()) {
+            final Food current = this.availableFood.get(this.currentIndex);
+            final int quantity = this.currentFoodMap.getOrDefault(current, 0);
+
+            this.foodLabel.setText(current.getName().toUpperCase(Locale.ROOT) + " (x" + quantity + ")");
+        }
     }
 }

@@ -8,7 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -20,103 +20,102 @@ import java.util.function.Consumer;
  */
 public final class InfirmaryView extends AbstractRoomView {
 
-    private static final int TOP_PADDING = 50;
-    private final Label feedbackLabel;
-    private final Button healButton;
-    private final Button nextItemButton;
+    private static final int TOP_PADDING = 30;
+    private static final double SPACING = 10.0;
+    private static final String ACTION_BTN_STYLE = "action-button";
+
+    private final Label potionLabel;
+    private final Button useButton;
+    private final Button nextPotionButton;
 
     private List<Potion> availablePotions = new ArrayList<>();
-    private Map<Potion, Integer> potionQuantities = new HashMap<>();
+    private Map<Potion, Integer> currentPotionMap = Collections.emptyMap();
     private int currentIndex = -1;
-    private Potion currentSelectedPotion;
-
-    private Consumer<Potion> onUsePotionAction;
+    private Consumer<Potion> onUseHandler;
 
     /**
      * Initializes the Infirmary layout.
      */
     public InfirmaryView() {
         super("Infirmary");
-
         this.getStylesheets().add(Objects.requireNonNull(getClass()
                 .getResource("/style/room/styleInfirmaryView.css")).toExternalForm());
         this.getStylesheets().add(Objects.requireNonNull(getClass()
                 .getResource("/style/room/defaultRoom.css")).toExternalForm());
         this.getStyleClass().add("infirmary-view");
 
-        final VBox topContainer = new VBox();
+        final VBox topContainer = new VBox(SPACING);
         topContainer.setAlignment(Pos.CENTER);
         topContainer.setPadding(new Insets(TOP_PADDING, 0, 0, 0));
 
-        this.feedbackLabel = new Label("Medicine cabinet empty.");
-        this.feedbackLabel.getStyleClass().add("selected-potion-label");
+        final Label titleLabel = new Label("INFIRMARY");
+        titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: black;");
 
-        topContainer.getChildren().add(feedbackLabel);
+        this.potionLabel = new Label("Empty");
+        this.potionLabel.getStyleClass().add("selected-item-label");
+
+        topContainer.getChildren().addAll(titleLabel, this.potionLabel);
         this.setTop(topContainer);
 
-        this.healButton = new Button("USE POTION");
-        this.healButton.getStyleClass().add("action-button");
-        this.healButton.setDisable(true);
+        this.useButton = new Button("Use");
+        this.useButton.getStyleClass().add(ACTION_BTN_STYLE);
+        this.useButton.setOnAction(_ -> triggerUse());
 
-        this.nextItemButton = new Button("NEXT ITEM");
-        this.nextItemButton.getStyleClass().add("action-button");
+        this.nextPotionButton = new Button("Next");
+        this.nextPotionButton.getStyleClass().add(ACTION_BTN_STYLE);
+        this.nextPotionButton.setOnAction(_ -> scrollNext());
 
-        this.nextItemButton.setOnAction(_ -> scrollNextItem());
-        this.healButton.setOnAction(_ -> triggerHeal());
-
-        this.getActionBar().getChildren().addAll(this.healButton, this.nextItemButton);
+        this.getActionBar().getChildren().addAll(this.nextPotionButton, this.useButton);
     }
 
     /**
-     * Refresh the potions displayed.
+     * Updates the potion list and quantities.
      *
-     * @param potions map of potions.
+     * @param potions the map of potions and their counts.
      */
     public void refreshPotions(final Map<Potion, Integer> potions) {
-        this.potionQuantities = new HashMap<>(potions);
+        this.currentPotionMap = potions;
         this.availablePotions = new ArrayList<>(potions.keySet());
 
         if (this.availablePotions.isEmpty()) {
+            this.potionLabel.setText("Empty");
             this.currentIndex = -1;
-            this.currentSelectedPotion = null;
-            this.feedbackLabel.setText("Medicine cabinet empty.");
-            this.healButton.setDisable(true);
+            this.useButton.setDisable(true);
         } else {
-            if (this.currentIndex < 0 || this.currentIndex >= this.availablePotions.size()) {
-                this.currentIndex = 0;
-            }
-            this.currentSelectedPotion = this.availablePotions.get(this.currentIndex);
-            this.healButton.setDisable(false);
+            this.currentIndex = 0;
+            this.useButton.setDisable(false);
             updateDisplay();
         }
     }
 
-    private void scrollNextItem() {
+    /**
+     * Sets the use potion handler.
+     *
+     * @param handler the consumer.
+     */
+    public void setOnUsePotion(final Consumer<Potion> handler) {
+        this.onUseHandler = handler;
+    }
+
+    private void scrollNext() {
         if (!this.availablePotions.isEmpty()) {
             this.currentIndex = (this.currentIndex + 1) % this.availablePotions.size();
-            this.currentSelectedPotion = this.availablePotions.get(this.currentIndex);
             updateDisplay();
+        }
+    }
+
+    private void triggerUse() {
+        if (this.currentIndex >= 0 && !this.availablePotions.isEmpty() && this.onUseHandler != null) {
+            this.onUseHandler.accept(this.availablePotions.get(this.currentIndex));
         }
     }
 
     private void updateDisplay() {
-        if (this.currentSelectedPotion != null) {
-            final String name = this.currentSelectedPotion.getName().toUpperCase(Locale.ROOT);
-            final int qty = this.potionQuantities.get(this.currentSelectedPotion);
-            this.feedbackLabel.setText(name + " (x" + qty + ")");
-        }
-    }
+        if (this.currentIndex >= 0 && this.currentIndex < this.availablePotions.size()) {
+            final Potion current = this.availablePotions.get(this.currentIndex);
+            final int quantity = this.currentPotionMap.getOrDefault(current, 0);
 
-    private void triggerHeal() {
-        if (this.currentSelectedPotion != null && this.onUsePotionAction != null) {
-            this.onUsePotionAction.accept(this.currentSelectedPotion);
+            this.potionLabel.setText(current.getName().toUpperCase(Locale.ROOT) + " (x" + quantity + ")");
         }
-    }
-
-    /**
-     * @param listener handler for potion use.
-     */
-    public void setOnUsePotion(final Consumer<Potion> listener) {
-        this.onUsePotionAction = listener;
     }
 }

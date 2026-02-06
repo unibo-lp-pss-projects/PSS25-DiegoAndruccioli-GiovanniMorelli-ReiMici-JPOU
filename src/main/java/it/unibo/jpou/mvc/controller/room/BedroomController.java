@@ -39,6 +39,7 @@ public final class BedroomController {
         this.inventory = inventory;
 
         setupLogic();
+        refreshView();
     }
 
     private void setupLogic() {

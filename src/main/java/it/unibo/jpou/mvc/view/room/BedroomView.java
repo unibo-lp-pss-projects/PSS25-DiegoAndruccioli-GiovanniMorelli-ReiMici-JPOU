@@ -20,7 +20,8 @@ import java.util.function.Consumer;
  */
 public final class BedroomView extends AbstractRoomView {
 
-    private static final int TOP_PADDING = 50;
+    private static final int TOP_PADDING = 30;
+    private static final double SPACING = 10.0;
     private static final String NIGHT_MODE_STYLE = "night-mode";
     private static final String ACTION_BTN_STYLE = "action-button";
 
@@ -45,14 +46,17 @@ public final class BedroomView extends AbstractRoomView {
                 .getResource("/style/room/defaultRoom.css")).toExternalForm());
         this.getStyleClass().add("bedroom-view");
 
-        final VBox topContainer = new VBox();
+        final VBox topContainer = new VBox(SPACING);
         topContainer.setAlignment(Pos.CENTER);
         topContainer.setPadding(new Insets(TOP_PADDING, 0, 0, 0));
+
+        final Label titleLabel = new Label("BEDROOM");
+        titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: black;");
 
         this.feedbackLabel = new Label("Wardrobe empty");
         this.feedbackLabel.getStyleClass().add("selected-item-label");
 
-        topContainer.getChildren().add(feedbackLabel);
+        topContainer.getChildren().addAll(titleLabel, this.feedbackLabel);
         this.setTop(topContainer);
 
         this.actionButton = new Button("Sleep");
@@ -95,6 +99,7 @@ public final class BedroomView extends AbstractRoomView {
 
     /**
      * Updates the UI based on Pou's state.
+     * Handles text changes and Night Mode CSS.
      *
      * @param state the current state of Pou.
      */
@@ -102,6 +107,7 @@ public final class BedroomView extends AbstractRoomView {
         final boolean isSleeping = state == PouState.SLEEPING;
 
         this.actionButton.setText(isSleeping ? "Wake Up" : "Sleep");
+
         this.nextSkinButton.setDisable(isSleeping);
         this.selectSkinButton.setDisable(isSleeping);
 
