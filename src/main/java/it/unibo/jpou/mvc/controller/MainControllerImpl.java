@@ -6,6 +6,8 @@ import it.unibo.jpou.mvc.model.PouStatistics;
 import it.unibo.jpou.mvc.model.Room;
 import it.unibo.jpou.mvc.model.inventory.Inventory;
 import it.unibo.jpou.mvc.model.inventory.InventoryImpl;
+import it.unibo.jpou.mvc.model.items.consumable.food.Food;
+import it.unibo.jpou.mvc.model.items.consumable.potion.Potion;
 import it.unibo.jpou.mvc.view.MainView;
 import it.unibo.jpou.mvc.view.room.AbstractRoomView;
 import it.unibo.jpou.mvc.view.room.BathroomView;
@@ -15,10 +17,11 @@ import it.unibo.jpou.mvc.view.room.KitchenView;
 import it.unibo.jpou.mvc.view.room.ShopView;
 import javafx.application.Platform;
 
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of the Main Controller acting as the Logic Orchestrator.
@@ -51,6 +54,8 @@ public final class MainControllerImpl implements MainController {
         this.mainView = Objects.requireNonNull(view, "View cannot be null");
 
         this.model = new PouLogic();
+        this.model.setCoins(1000); // monete iniziali x debug
+
         this.inventory = new InventoryImpl();
         this.gameLoop = new PouGameLoop();
 
@@ -68,6 +73,7 @@ public final class MainControllerImpl implements MainController {
 
         setupNavigation();
         setupGameLoop();
+        setupConsumableHandlers();
 
         this.mainView.setRoom(this.bedroomView);
         LOGGER.info("[MainController] Logic System initialized.");
@@ -105,20 +111,74 @@ public final class MainControllerImpl implements MainController {
                 String.valueOf(this.model.getHealth()));
     }
 
+    private void setupConsumableHandlers() {
+        this.kitchenView.setOnEat(food -> {
+            try {
+                this.model.eat(food);
+                this.inventory.consumeItem(food);
+
+                updateRoomData(this.kitchenView);
+                updateGlobalStatistics();
+
+                LOGGER.info("Pou ate: " + food.getName());
+            } catch (final IllegalArgumentException e) {
+                LOGGER.warning("Eat action failed: " + e.getMessage());
+            }
+        });
+
+        this.infirmaryView.setOnUsePotion(potion -> {
+            try {
+                this.model.usePotion(potion);
+                this.inventory.consumeItem(potion);
+
+                updateRoomData(this.infirmaryView);
+                updateGlobalStatistics();
+
+                LOGGER.info("Pou used potion: " + potion.getName());
+            } catch (final IllegalArgumentException e) {
+                LOGGER.warning("Potion action failed: " + e.getMessage());
+            }
+        });
+    }
+
+    /**
+     * Handles the transition between rooms.
+     *
+     * @param newRoomView The view to switch to.
+     */
     private void changeRoom(final AbstractRoomView newRoomView) {
         if (!(newRoomView instanceof BedroomView) && this.model.getState() == PouState.SLEEPING) {
             this.model.wakeUp();
         }
 
-        if (newRoomView instanceof KitchenView) {
-            ((KitchenView) newRoomView).refreshItems(new HashMap<>(this.inventory.getConsumables()));
-        } else if (newRoomView instanceof InfirmaryView) {
-            ((InfirmaryView) newRoomView).refreshItems(new HashMap<>(this.inventory.getConsumables()));
-        } else if (newRoomView instanceof ShopView) {
+        this.mainView.setCharacterVisible(!(newRoomView instanceof ShopView));
+
+        if (newRoomView instanceof ShopView) {
             this.shopControllerSupplier.get().populateShop((ShopView) newRoomView);
+        } else {
+            updateRoomData(newRoomView);
         }
 
         this.mainView.setRoom(newRoomView);
+    }
+
+    /**
+     * Synchronizes room views with the current inventory state.
+     *
+     * @param currentView The view to update.
+     */
+    private void updateRoomData(final AbstractRoomView currentView) {
+        if (currentView instanceof KitchenView) {
+            final Map<Food, Integer> foodMap = this.inventory.getConsumables().entrySet().stream()
+                    .filter(entry -> entry.getKey() instanceof Food)
+                    .collect(Collectors.toMap(e -> (Food) e.getKey(), Map.Entry::getValue));
+            ((KitchenView) currentView).refreshFood(foodMap);
+        } else if (currentView instanceof InfirmaryView) {
+            final Map<Potion, Integer> potionMap = this.inventory.getConsumables().entrySet().stream()
+                    .filter(entry -> entry.getKey() instanceof Potion)
+                    .collect(Collectors.toMap(e -> (Potion) e.getKey(), Map.Entry::getValue));
+            ((InfirmaryView) currentView).refreshPotions(potionMap);
+        }
     }
 
     @Override
