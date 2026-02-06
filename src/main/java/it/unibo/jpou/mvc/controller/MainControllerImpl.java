@@ -1,7 +1,6 @@
 package it.unibo.jpou.mvc.controller;
 
-import it.unibo.jpou.mvc.controller.minigames.FruitCatcherController;
-import it.unibo.jpou.mvc.controller.minigames.FruitCatcherControllerImpl;
+import it.unibo.jpou.mvc.controller.room.GameRoomController;
 import it.unibo.jpou.mvc.model.PouLogic;
 import it.unibo.jpou.mvc.model.PouState;
 import it.unibo.jpou.mvc.model.PouStatistics;
@@ -9,8 +8,6 @@ import it.unibo.jpou.mvc.model.Room;
 import it.unibo.jpou.mvc.model.inventory.Inventory;
 import it.unibo.jpou.mvc.model.inventory.InventoryImpl;
 import it.unibo.jpou.mvc.view.MainView;
-import it.unibo.jpou.mvc.view.minigames.FruitCatcherJavaFXView;
-import it.unibo.jpou.mvc.view.minigames.FruitCatcherView;
 import it.unibo.jpou.mvc.view.room.AbstractRoomView;
 import it.unibo.jpou.mvc.view.room.BathroomView;
 import it.unibo.jpou.mvc.view.room.BedroomView;
@@ -19,7 +16,6 @@ import it.unibo.jpou.mvc.view.room.KitchenView;
 import it.unibo.jpou.mvc.view.room.ShopView;
 import it.unibo.jpou.mvc.view.room.GameRoomView;
 import javafx.application.Platform;
-import it.unibo.jpou.mvc.view.character.PouCharacterView;
 
 import java.util.HashMap;
 import java.util.Objects;
@@ -49,8 +45,7 @@ public final class MainControllerImpl implements MainController {
     private final ShopView shopView;
     private final GameRoomView gameRoomView;
 
-    //per scalabilita minigame
-    private FruitCatcherController activeMinigame;
+    private final GameRoomController gameRoomController;
 
     /**
      * Constructs the logical system and wires dependencies.
@@ -76,20 +71,21 @@ public final class MainControllerImpl implements MainController {
 
         this.shopControllerSupplier = () -> shopCtrl;
         this.inventoryControllerSupplier = () -> invCtrl;
+        this.gameRoomController = new GameRoomController(
+                this.model,
+                this.gameRoomView,
+                this.mainView,
+                this.gameLoop,
+                () -> Platform.runLater(this::updateGlobalStatistics)
+        );
 
-        setupGameRoomLogic();
         setupNavigation();
         setupGameLoop();
 
         this.mainView.bindPouAge(this.model.ageProperty());
 
         this.mainView.setRoom(this.bedroomView);
-        //this.mainView.setRoom(this.gameRoomView);
         LOGGER.info("[MainController] Logic System initialized.");
-    }
-
-    private void setupGameRoomLogic() {
-        this.gameRoomView.setOnFruitCatcherAction(e -> this.startFruitCatcher());
     }
 
     private void setupNavigation() {
@@ -151,55 +147,10 @@ public final class MainControllerImpl implements MainController {
     @Override
     public void stop() {
         this.gameLoop.shutdown();
-        if (this.activeMinigame != null) {
-            this.activeMinigame.shutdown();
+        if (this.gameRoomController != null) {
+            this.gameRoomController.shutdown();
         }
         LOGGER.info("[MainController] GameLoop stopped.");
-    }
-
-    /**
-     * Avvia il minigioco Fruit Catcher.
-     * Questo metodo deve essere chiamato quando si preme il bottone nella GameRoom.
-     */
-    @Override
-    public void startFruitCatcher() {
-        LOGGER.info("[MainController] Starting Fruit Catcher...");
-
-        //ferma loop principale
-        this.gameLoop.shutdown();
-
-        final PouCharacterView pouView = this.mainView.getPouCharacterView();
-
-        final FruitCatcherView minigameView = new FruitCatcherJavaFXView(pouView);
-
-        this.activeMinigame = new FruitCatcherControllerImpl(minigameView, coins -> {
-            LOGGER.info("Minigame finished. Coins won: " + coins);
-            this.model.addCoins(coins);
-            closeMinigame(minigameView);
-        });
-
-        this.mainView.showMinigame(minigameView.getNode());
-
-        this.activeMinigame.start();
-    }
-
-    /**
-     * Chiude il minigioco e ripristina la schermata principale.
-     *
-     * @param minigameView the view of the minigame to remove.
-     */
-    private void closeMinigame(final FruitCatcherView minigameView) {
-        Platform.runLater(() -> {
-            this.mainView.removeMinigame(minigameView.getNode());
-
-            this.mainView.restoreCharacter();
-
-            this.activeMinigame = null;
-
-            this.gameLoop.start();
-
-            updateGlobalStatistics();
-        });
     }
 
     /**
@@ -213,12 +164,5 @@ public final class MainControllerImpl implements MainController {
     @Override
     public InventoryController getInventoryController() {
         return this.inventoryControllerSupplier.get();
-    }
-
-    /**
-     * @return a runnable that starts the fruit catcher game.
-     */
-    public Runnable getFruitCatcherStarter() {
-        return this::startFruitCatcher;
     }
 }

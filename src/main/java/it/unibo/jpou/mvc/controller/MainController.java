@@ -18,11 +18,6 @@ public interface MainController {
     void stop();
 
     /**
-     * Starts the Fruit Catcher minigame.
-     */
-    void startFruitCatcher();
-
-    /**
      * Returns the controller responsible for the Shop logic.
      *
      * @return the shop controller instance.

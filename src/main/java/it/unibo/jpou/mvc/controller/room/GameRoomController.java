@@ -1,5 +1,6 @@
 package it.unibo.jpou.mvc.controller.room;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import it.unibo.jpou.mvc.controller.GameLoop;
 import it.unibo.jpou.mvc.controller.minigames.FruitCatcherController;
 import it.unibo.jpou.mvc.controller.minigames.FruitCatcherControllerImpl;
@@ -14,8 +15,12 @@ import javafx.application.Platform;
 import java.util.logging.Logger;
 
 /**
- * Controller responsabile della GameRoom e dell'avvio dei minigiochi.
+ * Controller responsible for the GameRoom and starting minigames.
  */
+@SuppressFBWarnings(
+        value = "EI_EXPOSE_REP2",
+        justification = "Controller must store references to Model and View passed by DI."
+)
 public final class GameRoomController {
 
     private static final Logger LOGGER = Logger.getLogger(GameRoomController.class.getName());
@@ -25,15 +30,14 @@ public final class GameRoomController {
     private final GameLoop mainGameLoop;
     private final Runnable globalStatsUpdater;
 
-    // Manteniamo qui il riferimento al minigioco attivo
     private FruitCatcherController activeMinigame;
 
     /**
-     * @param model              il modello logico principale (per aggiungere le monete).
-     * @param view               la view della stanza (per settare il listener sul bottone).
-     * @param mainView           la view principale (per mostrare l'overlay del minigioco).
-     * @param mainGameLoop       il loop principale (da fermare quando parte il minigioco).
-     * @param globalStatsUpdater callback per aggiornare le statistiche nella top bar al ritorno.
+     * @param model The main logic model (to add coins).
+     * @param view The room view (to set the listener on the button).
+     * @param mainView The main view (to display the minigame overlay).
+     * @param mainGameLoop The main loop (to stop when the minigame starts).
+     * @param globalStatsUpdater The callback to update the stats in the top bar upon return.
      */
     public GameRoomController(final PouLogic model,
                               final GameRoomView view,
@@ -45,50 +49,43 @@ public final class GameRoomController {
         this.mainGameLoop = mainGameLoop;
         this.globalStatsUpdater = globalStatsUpdater;
 
-        // Setup del listener: delega l'azione al metodo interno
+        // delega l'azione al metodo interno
         view.setOnFruitCatcherAction(e -> startFruitCatcher());
     }
 
     private void startFruitCatcher() {
         LOGGER.info("[GameRoomController] Starting Fruit Catcher...");
 
-        // 1. Ferma il loop principale (il minigioco ha il suo loop interno)
         this.mainGameLoop.shutdown();
 
-        // 2. Prepara la view del minigioco
         final PouCharacterView pouView = this.mainView.getPouCharacterView();
         final FruitCatcherView minigameView = new FruitCatcherJavaFXView(pouView);
 
-        // 3. Istanzia il controller del minigioco
         this.activeMinigame = new FruitCatcherControllerImpl(minigameView, coins -> {
             LOGGER.info("Minigame finished. Coins won: " + coins);
             this.model.addCoins(coins);
             closeMinigame(minigameView);
         });
 
-        // 4. Mostra il minigioco e avvialo
         this.mainView.showMinigame(minigameView.getNode());
         this.activeMinigame.start();
     }
 
     private void closeMinigame(final FruitCatcherView minigameView) {
         Platform.runLater(() -> {
-            // Rimuovi la view del minigioco
             this.mainView.removeMinigame(minigameView.getNode());
 
-            // Ripristina il personaggio nella schermata principale
             this.mainView.restoreCharacter();
 
             this.activeMinigame = null;
 
-            // Riavvia il loop principale e aggiorna la UI
             this.mainGameLoop.start();
             this.globalStatsUpdater.run();
         });
     }
 
     /**
-     * Metodo di sicurezza per fermare il minigioco se l'app viene chiusa.
+     * Safety method to stop the minigame if the app is closed.
      */
     public void shutdown() {
         if (this.activeMinigame != null && this.activeMinigame.isRunning()) {
