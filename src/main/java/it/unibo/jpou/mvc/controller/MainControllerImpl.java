@@ -197,6 +197,7 @@ public final class MainControllerImpl implements MainController {
     /**
      * @return the shop controller instance.
      */
+    @Override
     public ShopController getShopController() {
         return this.shopControllerSupplier.get();
     }
