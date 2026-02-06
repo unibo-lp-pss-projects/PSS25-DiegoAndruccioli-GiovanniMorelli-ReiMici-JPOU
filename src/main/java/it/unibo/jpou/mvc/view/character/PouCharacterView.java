@@ -75,4 +75,18 @@ public final class PouCharacterView extends Group {
     public void setSleeping(final boolean sleeping) {
         this.eyes.setSleeping(sleeping);
     }
+
+    /**
+     * Disables the age-based scaling and sets a fixed scale for the character.
+     * Useful for minigames where the size must be constant.
+     *
+     * @param scale the fixed scale value (e.g., 0.5 for half size)
+     */
+    public void setFixedScale(final double scale) {
+        this.scaleXProperty().unbind();
+        this.scaleYProperty().unbind();
+
+        this.setScaleX(scale);
+        this.setScaleY(scale);
+    }
 }

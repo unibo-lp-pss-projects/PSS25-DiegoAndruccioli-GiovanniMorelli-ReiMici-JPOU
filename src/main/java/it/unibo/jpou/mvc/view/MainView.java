@@ -1,6 +1,7 @@
 package it.unibo.jpou.mvc.view;
 
 import it.unibo.jpou.mvc.model.Room;
+import it.unibo.jpou.mvc.view.character.PouCharacterView;
 import it.unibo.jpou.mvc.view.component.BottomNavBarComponent;
 import it.unibo.jpou.mvc.view.component.CenterContainerComponent;
 import it.unibo.jpou.mvc.view.component.TopBarComponent;
@@ -52,6 +53,22 @@ public final class MainView extends StackPane {
         this.gameOverOverlay.setVisible(false);
 
         this.getChildren().addAll(mainLayout, this.pauseOverlay, this.gameOverOverlay);
+    }
+
+    /**
+     * Gets the character view instance.
+     *
+     * @return the PouCharacterView.
+     */
+    public PouCharacterView getPouCharacterView() {
+        return this.centerContainer.getPouCharacterView();
+    }
+
+    /**
+     * Restores the character to the main view container.
+     */
+    public void restoreCharacter() {
+        this.centerContainer.restoreCharacter();
     }
 
     /**

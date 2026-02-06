@@ -1,5 +1,6 @@
 package it.unibo.jpou.mvc.view.component;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import it.unibo.jpou.mvc.view.character.PouCharacterView;
 import it.unibo.jpou.mvc.view.room.AbstractRoomView;
 import javafx.beans.property.IntegerProperty;
@@ -35,6 +36,34 @@ public final class CenterContainerComponent extends StackPane {
             this.getChildren().removeFirst();
         }
         this.getChildren().addFirst(roomView);
+    }
+
+    /**
+     * Returns the character view instance.
+     *
+     * @return the character view instance.
+     */
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP",
+            justification = "Access to the view node is required for the minigame architecture")
+    public PouCharacterView getPouCharacterView() {
+        return this.characterView;
+    }
+
+    /**
+     * Restores the character in this container after it has been used elsewhere (e.g., a minigame).
+     * Also resets layouts and transformations.
+     */
+    public void restoreCharacter() {
+        if (!this.getChildren().contains(this.characterView)) {
+            // reset proprietà modificate dal minigioco
+            this.characterView.setManaged(true);
+            this.characterView.setTranslateX(0);
+            this.characterView.setTranslateY(0);
+            this.characterView.setLayoutX(0);
+            this.characterView.setLayoutY(0);
+
+            this.getChildren().add(this.characterView);
+        }
     }
 
     /**

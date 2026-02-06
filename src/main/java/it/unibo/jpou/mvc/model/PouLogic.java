@@ -305,4 +305,14 @@ public final class PouLogic {
     public IntegerProperty ageProperty() {
         return this.age;
     }
+
+    /**
+     * Sets the age of Pou.
+     * Useful for loading saved data.
+     *
+     * @param v the age value.
+     */
+    public void setAge(final int v) {
+        this.age.set(Math.max(0, v));
+    }
 }

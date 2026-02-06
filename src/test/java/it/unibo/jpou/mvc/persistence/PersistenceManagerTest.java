@@ -89,7 +89,8 @@ class PersistenceManagerTest {
                 CUSTOM_STATISTICS,
                 CUSTOM_STATISTICS,
                 CUSTOM_WALLET,
-                PouState.SLEEPING.name()
+                PouState.SLEEPING.name(),
+                0
         );
 
         final SavedInventory customInventory = new SavedInventory(
