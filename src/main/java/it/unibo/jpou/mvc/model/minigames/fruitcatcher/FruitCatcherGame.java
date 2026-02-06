@@ -17,12 +17,12 @@ public final class FruitCatcherGame implements Minigame {
     private static final int GAME_HEIGHT = 550;
     private static final int OBJ_SIZE = 35;
     private static final int PLAYER_SIZE = 60;
-    private static final double PLAYER_Y_POS = 430;
+    private static final double PLAYER_Y_POS = 480;
     private static final double GRAVITY = 2.5;
     private static final double MAX_TIME = 60.0;
     private static final double TIME_DECREMENT = 0.017;
 
-    private static final double SPAWN_PROBABILITY = 0.02;
+    private static final double SPAWN_PROBABILITY = 0.05;
 
     // 0.0 - 0.2: BOMBA (20%)
     // 0.2 - 0.3: ANANAS (20%)
@@ -31,9 +31,6 @@ public final class FruitCatcherGame implements Minigame {
     private static final double BOMB_CHANCE_THRESHOLD = 0.2;
     private static final double BANANA_CHANCE_THRESHOLD = 0.3;
     private static final double PINEAPPLE_CHANCE_THRESHOLD = 0.5;
-
-    private static final double HITBOX_TOLERANCE_FACTOR = 1.0;
-    private static final double PLAYER_BOUNDARY_OFFSET = 50.0;
 
     private final List<FallingObject> fallingObjects;
     private final Random random;
@@ -59,7 +56,7 @@ public final class FruitCatcherGame implements Minigame {
         this.score = 0;
         this.gameOver = false;
         this.fallingObjects.clear();
-        this.pouX = GAME_WIDTH / 2.0;
+        this.pouX = (GAME_WIDTH - PLAYER_SIZE) / 2.0;
         this.timeLeft = MAX_TIME;
     }
 
@@ -113,8 +110,11 @@ public final class FruitCatcherGame implements Minigame {
 
             obj.fall(GRAVITY);
 
-            final boolean hitX = Math.abs(obj.getX() - this.pouX) < (PLAYER_SIZE / HITBOX_TOLERANCE_FACTOR);
-            final boolean hitY = obj.getY() > PLAYER_Y_POS && obj.getY() < PLAYER_Y_POS + PLAYER_SIZE;
+            final boolean hitX = this.pouX < obj.getX() + OBJ_SIZE
+                    && this.pouX + PLAYER_SIZE > obj.getX();
+
+            final boolean hitY = PLAYER_Y_POS < obj.getY() + OBJ_SIZE
+                    && PLAYER_Y_POS + PLAYER_SIZE > obj.getY();
 
             if (hitX && hitY) {
                 if (obj.isBomb()) {
@@ -152,8 +152,8 @@ public final class FruitCatcherGame implements Minigame {
     public void setPlayerPosition(final double x) {
         if (x < 0) {
             this.pouX = 0;
-        } else if (x > GAME_WIDTH - PLAYER_BOUNDARY_OFFSET) {
-            this.pouX = GAME_WIDTH - PLAYER_BOUNDARY_OFFSET;
+        } else if (x > GAME_WIDTH - PLAYER_SIZE) {
+            this.pouX = GAME_WIDTH - PLAYER_SIZE;
         } else {
             this.pouX = x;
         }
