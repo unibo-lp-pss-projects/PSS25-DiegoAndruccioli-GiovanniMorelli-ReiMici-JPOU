@@ -7,58 +7,59 @@ import javafx.scene.layout.StackPane;
 
 /**
  * Component managing the central area where rooms and the character are displayed.
- * It ensures the dynamic character is always rendered on top of the current room.
+ * Updated for Dependency Injection.
  */
 public final class CenterContainerComponent extends StackPane {
 
     private final PouCharacterView characterView;
 
     /**
-     * Initializes the center container, applying styles and loading the dynamic character.
+     * Initializes the center container using an existing character view.
+     *
+     * @param characterView the shared character view instance (Dependency Injection).
      */
-    public CenterContainerComponent() {
+    public CenterContainerComponent(final PouCharacterView characterView) {
         this.getStyleClass().add("center-container");
-
-        this.characterView = new PouCharacterView();
-
+        this.characterView = characterView;
+        this.characterView.setPickOnBounds(false);
+        this.characterView.setMouseTransparent(true);
         this.getChildren().add(this.characterView);
     }
 
     /**
      * Replaces the current room with a new one.
-     * The room is inserted at index 0 (background) to ensure the character (index 1) stays on top.
      *
      * @param roomView the new room to display.
      */
     public void setRoom(final AbstractRoomView roomView) {
         if (this.getChildren().size() > 1) {
-            this.getChildren().removeFirst();
+            this.getChildren().remove(0);
         }
-        this.getChildren().addFirst(roomView);
+        this.getChildren().add(0, roomView);
     }
 
     /**
-     * Sets the character's visibility.
+     * Sets character visibility.
      *
-     * @param visible true to show the character, false to hide it.
+     * @param visible true to show
      */
     public void setCharacterVisible(final boolean visible) {
         this.characterView.setVisible(visible);
     }
 
     /**
-     * Updates the character's sleeping visuals.
+     * Sets sleeping visuals.
      *
-     * @param sleeping true to close eyes
+     * @param sleeping true if sleeping
      */
     public void setPouSleeping(final boolean sleeping) {
         this.characterView.setSleeping(sleeping);
     }
 
     /**
-     * Binds the character size to the logic age.
+     * Binds size property.
      *
-     * @param ageProperty the property representing the age of the character.
+     * @param ageProperty property to bind
      */
     public void bindPouSize(final IntegerProperty ageProperty) {
         this.characterView.bindSize(ageProperty);

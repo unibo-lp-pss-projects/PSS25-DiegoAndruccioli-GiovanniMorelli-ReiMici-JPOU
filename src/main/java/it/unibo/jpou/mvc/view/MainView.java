@@ -1,172 +1,146 @@
 package it.unibo.jpou.mvc.view;
 
 import it.unibo.jpou.mvc.model.Room;
+import it.unibo.jpou.mvc.view.character.PouCharacterView;
 import it.unibo.jpou.mvc.view.component.BottomNavBarComponent;
 import it.unibo.jpou.mvc.view.component.CenterContainerComponent;
 import it.unibo.jpou.mvc.view.component.TopBarComponent;
-import it.unibo.jpou.mvc.view.overlay.GameOverOverlayView;
-import it.unibo.jpou.mvc.view.overlay.PauseOverlayView;
 import it.unibo.jpou.mvc.view.room.AbstractRoomView;
-import javafx.beans.property.IntegerProperty;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+import javafx.beans.property.ReadOnlyIntegerProperty;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
- * The root container of the UI.
+ * Main View container acting as the layout orchestrator.
  */
-public final class MainView extends StackPane {
-
-    private static final String[] STATS = {"hunger", "energy", "fun", "health"};
-
-    private final TopBarComponent topBar;
-    private final BottomNavBarComponent bottomBar;
-    private final CenterContainerComponent centerContainer;
-    private final PauseOverlayView pauseOverlay;
-    private final GameOverOverlayView gameOverOverlay;
+public final class MainView {
 
     private final BorderPane mainLayout;
+    private final StackPane rootStack;
+    private final TopBarComponent topBar;
+    private final CenterContainerComponent centerContainer;
+    private final BottomNavBarComponent bottomBar;
+    private final PouCharacterView characterView;
 
     /**
-     * Assemblies the entire game interface.
+     * Initializes the main view structure.
      */
     public MainView() {
-        this.getStylesheets().add(Objects.requireNonNull(
-                getClass().getResource("/style/styleMainView.css")).toExternalForm());
-
-        this.topBar = new TopBarComponent(STATS);
-        this.bottomBar = new BottomNavBarComponent(Room.values());
-        this.centerContainer = new CenterContainerComponent();
-        this.pauseOverlay = new PauseOverlayView();
-        this.gameOverOverlay = new GameOverOverlayView();
-
         this.mainLayout = new BorderPane();
+        this.rootStack = new StackPane(this.mainLayout);
+
+        this.mainLayout.getStyleClass().add("main-view");
+        this.mainLayout.getStylesheets().add(Objects.requireNonNull(getClass()
+                .getResource("/style/styleMainView.css")).toExternalForm());
+
+        final String[] statsKeys = {"hunger", "health", "energy", "fun"};
+        this.topBar = new TopBarComponent(statsKeys);
+
+        this.characterView = new PouCharacterView();
+        this.centerContainer = new CenterContainerComponent(this.characterView);
+        this.bottomBar = new BottomNavBarComponent(Room.values());
+
         this.mainLayout.setTop(this.topBar);
         this.mainLayout.setCenter(this.centerContainer);
         this.mainLayout.setBottom(this.bottomBar);
-
-        this.pauseOverlay.setVisible(false);
-        this.gameOverOverlay.setVisible(false);
-
-        this.getChildren().addAll(mainLayout, this.pauseOverlay, this.gameOverOverlay);
     }
 
     /**
-     * Binds the Pou character size to the logic age property.
-     *
-     * @param ageProperty the property representing Pou's age.
+     * @return the root JavaFX node.
      */
-    public void bindPouAge(final IntegerProperty ageProperty) {
-        this.centerContainer.bindPouSize(ageProperty);
+    public Parent getNode() {
+        return this.rootStack;
     }
 
     /**
-     * Shows a minigame view on top of the main interface.
+     * Updates a statistic bar.
      *
-     * @param gameNode the visual root of the minigame.
+     * @param key statistic name
+     * @param progress value 0-1
+     * @param text label text
      */
-    public void showMinigame(final Parent gameNode) {
-        if (!this.getChildren().contains(gameNode)) {
-            this.getChildren().add(1, gameNode); //livello 1: minigioco. sovrappone la 0
-        }
-        gameNode.setVisible(true);
-        gameNode.requestFocus();
+    public void updateStat(final String key, final double progress, final String text) {
+        this.topBar.updateStat(key, progress, text);
     }
 
     /**
-     * Removes the minigame view from the interface.
+     * Sets the room change listener.
      *
-     * @param gameNode the visual root of the minigame to remove.
+     * @param room target room
+     * @param listener callback
      */
-    public void removeMinigame(final Parent gameNode) {
-        this.getChildren().remove(gameNode);
-        this.mainLayout.requestFocus();
+    public void setOnRoomChange(final Room room, final Consumer<Room> listener) {
+        this.bottomBar.setOnRoomChange(room, _ -> listener.accept(room));
     }
 
     /**
-     * Updates a statistic in the top bar.
+     * Changes the current room view.
      *
-     * @param key the stat name.
-     * @param val the value (0.0 - 1.0).
-     * @param txt the text label.
+     * @param roomView the new view
      */
-    public void updateStat(final String key, final double val, final String txt) {
-        this.topBar.updateStat(key, val, txt);
+    public void setRoom(final AbstractRoomView roomView) {
+        this.centerContainer.setRoom(roomView);
     }
 
     /**
-     * Sets the room change handler.
+     * Sets character visibility.
      *
-     * @param room the room to switch to.
-     * @param handler the event handler.
-     */
-    public void setOnRoomChange(final Room room, final EventHandler<ActionEvent> handler) {
-        this.bottomBar.setOnRoomChange(room, handler);
-    }
-
-    /**
-     * Sets the resume action handler.
-     *
-     * @param handler the event handler.
-     */
-    public void setOnResumeAction(final EventHandler<ActionEvent> handler) {
-        this.pauseOverlay.setOnResume(handler);
-    }
-
-    /**
-     * Sets the restart action handler.
-     *
-     * @param handler the event handler.
-     */
-    public void setOnRestartAction(final EventHandler<ActionEvent> handler) {
-        this.gameOverOverlay.setOnRestart(handler);
-    }
-
-    /**
-     * Sets the current room view.
-     *
-     * @param room the room view.
-     */
-    public void setRoom(final AbstractRoomView room) {
-        this.centerContainer.setRoom(room);
-    }
-
-    /**
-     * Shows or hides the pause overlay.
-     *
-     * @param visible true to show.
-     */
-    public void setPauseVisible(final boolean visible) {
-        this.pauseOverlay.setVisible(visible);
-    }
-
-    /**
-     * Shows or hides the game over overlay.
-     *
-     * @param visible true to show.
-     */
-    public void setGameOverVisible(final boolean visible) {
-        this.gameOverOverlay.setVisible(visible);
-    }
-
-    /**
-     * Shows or hides the character.
-     *
-     * @param visible true to show.
+     * @param visible true to show
      */
     public void setCharacterVisible(final boolean visible) {
         this.centerContainer.setCharacterVisible(visible);
     }
 
     /**
-     * Updates the character visuals for sleeping state.
+     * Binds age property to character size.
      *
-     * @param sleeping true if Pou is sleeping
+     * @param ageProperty read-only property
+     */
+    public void bindPouAge(final ReadOnlyIntegerProperty ageProperty) {
+        if (ageProperty instanceof javafx.beans.property.IntegerProperty) {
+            this.centerContainer.bindPouSize((javafx.beans.property.IntegerProperty) ageProperty);
+        }
+    }
+
+    /**
+     * Sets sleeping visuals.
+     *
+     * @param sleeping true if sleeping
      */
     public void setPouSleeping(final boolean sleeping) {
         this.centerContainer.setPouSleeping(sleeping);
+    }
+
+    /**
+     * Shows a minigame overlay.
+     *
+     * @param node the minigame view
+     */
+    public void showMinigame(final Node node) {
+        this.rootStack.getChildren().add(node);
+    }
+
+    /**
+     * Removes a minigame overlay.
+     *
+     * @param node the minigame view
+     */
+    public void removeMinigame(final Node node) {
+        this.rootStack.getChildren().remove(node);
+    }
+
+    /**
+     * Updates skin color.
+     *
+     * @param hexColor hex code
+     */
+    public void setPouSkinColor(final String hexColor) {
+        if (this.characterView != null) {
+            this.characterView.updateSkinColor(hexColor);
+        }
     }
 }
