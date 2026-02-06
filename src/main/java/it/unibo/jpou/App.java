@@ -35,7 +35,7 @@ public final class App extends Application {
         this.controller = new MainControllerImpl(mainView);
         this.controller.start();
 
-        final Scene scene = new Scene(mainView, APP_WIDTH, APP_HEIGHT);
+        final Scene scene = new Scene(mainView.getNode(), APP_WIDTH, APP_HEIGHT);
         stage.setTitle("J-Pou");
         stage.setScene(scene);
         stage.setResizable(false);

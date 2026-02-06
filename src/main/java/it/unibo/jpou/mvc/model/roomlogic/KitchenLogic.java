@@ -4,19 +4,20 @@ import it.unibo.jpou.mvc.model.PouStatistics;
 import it.unibo.jpou.mvc.model.items.consumable.food.Food;
 
 /**
- * Logic for Kitchen, action eat.
+ * Logic for the Kitchen room.
  */
 public final class KitchenLogic {
 
     /**
-     * Make Pou eat a specific food.
+     * Updates statistics when Pou eats.
      *
-     * @param hunger the hunger statistic to modify.
-     * @param food the food item being consumed.
+     * @param hungerStat the hunger statistic.
+     * @param food       the food to consume.
      */
-    public void eat(final PouStatistics hunger, final Food food) {
-        if (food != null) {
-            hunger.setValueStat(hunger.getValueStat() + food.getEffectValue());
+    public void eat(final PouStatistics hungerStat, final Food food) {
+        if (food != null && hungerStat != null) {
+            final int newValue = hungerStat.getValueStat() + food.getEffectValue();
+            hungerStat.setValueStat(newValue);
         }
     }
 }
