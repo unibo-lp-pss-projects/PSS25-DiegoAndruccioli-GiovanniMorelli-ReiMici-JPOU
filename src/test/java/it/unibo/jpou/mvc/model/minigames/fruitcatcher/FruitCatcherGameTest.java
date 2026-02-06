@@ -1,22 +1,26 @@
 package it.unibo.jpou.mvc.model.minigames.fruitcatcher;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import java.util.logging.Logger;
-
 /**
- * Unit tests for the FruitCatcherGame logic.
+ * Unit tests for the FruitCatcherGame model.
  */
 class FruitCatcherGameTest {
 
-    private static final Logger LOGGER = Logger.getLogger(FruitCatcherGameTest.class.getName());
-    private static final double GAME_WIDTH = 800.0;
-    private static final double EXPECTED_CENTER_X = GAME_WIDTH / 2.0;
+    // CORREZIONE: Allineato alla larghezza reale del gioco (400 invece di 800)
+    private static final double GAME_WIDTH = 400.0;
+    private static final double PLAYER_BOUNDARY_OFFSET = 50.0;
+    private static final double INITIAL_TIME = 60.0;
+    private static final double TOLERANCE = 0.1;
+    private static final double MOVEMENT_DELTA = 50.0;
+    private static final double NEGATIVE_POSITION = -100.0;
+    private static final double OUT_OF_BOUNDS_POSITION = 1000.0;
 
     private FruitCatcherGame game;
 
@@ -27,42 +31,58 @@ class FruitCatcherGameTest {
     }
 
     @Test
-    @DisplayName("Test initial game state")
+    @DisplayName("Test Initial State")
     void testInitialState() {
-        LOGGER.info("Testing initial game state");
-        assertEquals(0, this.game.getScore(), "Score should start at 0");
-        assertFalse(this.game.isGameOver(), "Game should not start in Game Over state");
-        assertEquals(EXPECTED_CENTER_X, this.game.getPlayerX(), "Player should start at center screen");
-        assertTrue(this.game.getFallingObjects().isEmpty(), "No objects should be present at very start");
+        assertEquals(0, game.getScore(), "Il punteggio iniziale deve essere 0");
+        assertFalse(game.isGameOver(), "Il gioco non deve iniziare in Game Over");
+
+        assertEquals(GAME_WIDTH / 2, game.getPlayerX(), "Pou deve iniziare al centro dello schermo");
+
+        assertEquals(INITIAL_TIME, game.getTimeLeft(), TOLERANCE, "Il timer deve partire da 60 secondi");
     }
 
     @Test
-    @DisplayName("Test player position update")
-    void testPlayerMovement() {
-        LOGGER.info("Testing player position update");
-        final double newPosition = 150.0;
+    @DisplayName("Test Player Position Update (Movement)")
+    void testPlayerPositionUpdate() {
+        final double startX = game.getPlayerX();
+        final double newX = startX + MOVEMENT_DELTA;
 
-        this.game.setPlayerPosition(newPosition);
+        game.setPlayerPosition(newX);
 
-        assertEquals(newPosition, this.game.getPlayerX(), "Player X should update to the set value");
+        assertEquals(newX, game.getPlayerX(), "La posizione del giocatore deve aggiornarsi correttamente");
     }
 
     @Test
-    @DisplayName("Test game loop execution (basic sanity check)")
-    void testGameLoopSanity() {
-        LOGGER.info("Testing game loop execution");
-        // run gameloop per pochi frame
-        for (int i = 0; i < 100; i++) {
-            this.game.gameLoop(0);
-        }
+    @DisplayName("Test Boundary Left (0)")
+    void testBoundaryLeft() {
+        game.setPlayerPosition(NEGATIVE_POSITION);
 
-        assertFalse(this.game.isGameOver(), "Game should continue if no bombs hit");
+        assertEquals(0.0, game.getPlayerX(), "Pou non deve superare il bordo sinistro (0)");
     }
 
     @Test
-    @DisplayName("Test coin calculation at start")
-    void testInitialCoins() {
-        LOGGER.info("Testing initial coin calculation");
-        assertEquals(0, this.game.calculateCoins(), "Should yield 0 coins with 0 score");
+    @DisplayName("Test Boundary Right (Max Width)")
+    void testBoundaryRight() {
+        game.setPlayerPosition(OUT_OF_BOUNDS_POSITION);
+
+        final double expectedMaxX = GAME_WIDTH - PLAYER_BOUNDARY_OFFSET;
+
+        assertEquals(expectedMaxX, game.getPlayerX(), "Pou non deve superare il bordo destro");
+    }
+
+    @Test
+    @DisplayName("Test Game Loop Timer Decrement")
+    void testTimerDecrement() {
+        final double initialTime = game.getTimeLeft();
+
+        game.gameLoop(System.nanoTime());
+
+        assertTrue(game.getTimeLeft() < initialTime, "Il tempo deve diminuire dopo un ciclo di gioco");
+    }
+
+    @Test
+    @DisplayName("Test Coin Calculation")
+    void testEconomyMath() {
+        assertEquals(0, game.calculateCoins());
     }
 }

@@ -37,12 +37,19 @@ public final class FruitCatcherControllerImpl implements FruitCatcherController 
         this.running = false;
 
         this.view.setKeyListener(event -> {
+            if (event.getCode() == KeyCode.ESCAPE) {
+                if (!coinsAwarded) {
+                    awardCoins();
+                }
+                shutdown();
+                return;
+            }
             if (!isRunning()) {
                 return;
             }
 
             final double currentX = model.getPlayerX();
-            final double speed = 20.0;
+            final double speed = 40.0;
 
             if (event.getCode() == KeyCode.LEFT) {
                 updatePlayerPosition(currentX - speed);
@@ -79,6 +86,13 @@ public final class FruitCatcherControllerImpl implements FruitCatcherController 
         this.model.setPlayerPosition(x);
     }
 
+    private void awardCoins() {
+        final int earnedCoins = model.calculateCoins();
+        coinAwarder.accept(earnedCoins);
+
+        coinsAwarded = true;
+    }
+
     /**
      * Inner class extending AnimationTimer to handle the frame-by-frame updates.
      */
@@ -88,10 +102,6 @@ public final class FruitCatcherControllerImpl implements FruitCatcherController 
             if (model.isGameOver()) {
                 shutdown();
 
-                if (!coinsAwarded) {
-                    awardCoins();
-                }
-
                 view.render(model.getFallingObjects(), model.getScore(), model.getTimeLeft(), true, model.getPlayerX());
                 return;
             }
@@ -99,14 +109,6 @@ public final class FruitCatcherControllerImpl implements FruitCatcherController 
             model.gameLoop(now);
 
             view.render(model.getFallingObjects(), model.getScore(), model.getTimeLeft(), false, model.getPlayerX());
-        }
-
-        private void awardCoins() {
-            final int earnedCoins = model.calculateCoins();
-            if (earnedCoins > 0) {
-                coinAwarder.accept(earnedCoins);
-            }
-            coinsAwarded = true;
         }
     }
 }

@@ -16,4 +16,31 @@ public interface MainController {
      * Stops the application and releases resources.
      */
     void stop();
+
+    /**
+     * Starts the Fruit Catcher minigame.
+     */
+    void startFruitCatcher();
+
+    /**
+     * Returns the controller responsible for the Shop logic.
+     *
+     * @return the shop controller instance.
+     */
+    ShopController getShopController();
+
+    /**
+     * Returns the controller responsible for Inventory logic.
+     *
+     * @return the inventory controller instance.
+     */
+    InventoryController getInventoryController();
+
+    /**
+     * Returns the task to start the fruit catcher game.
+     * Useful for binding view actions to controller logic.
+     *
+     * @return a runnable task.
+     */
+    Runnable getFruitCatcherStarter();
 }

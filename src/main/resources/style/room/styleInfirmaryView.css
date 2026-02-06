@@ -2,16 +2,16 @@
     -fx-background-color: #e0f7fa;
 }
 
-.room-title {
-    -fx-font-size: 24px;
+.selected-potion-label {
+    -fx-font-size: 28px;
     -fx-font-weight: bold;
     -fx-text-fill: #006064;
 }
 
-.feedback-label {
-    -fx-font-size: 14px;
-    -fx-text-fill: #006064;
+.room-title {
+    -fx-font-size: 24px;
     -fx-font-weight: bold;
+    -fx-text-fill: #006064;
 }
 
 .bottom-panel {
@@ -21,11 +21,6 @@
     -fx-border-width: 2 0 0 0;
 }
 
-.potion-shelf {
-    -fx-padding: 5;
-    -fx-spacing: 10;
-}
-
 .potion-card {
     -fx-background-color: white;
     -fx-border-color: #006064;
@@ -33,24 +28,4 @@
     -fx-min-width: 80px;
     -fx-min-height: 80px;
     -fx-cursor: hand;
-}
-
-.potion-card:hover {
-    -fx-background-color: #e0f2f1;
-}
-
-.potion-name {
-    -fx-font-size: 12px;
-    -fx-text-fill: #006064;
-    -fx-font-weight: normal;
-}
-
-.potion-qty {
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #006064;
-}
-
-.shop-link-button {
-    -fx-font-size: 14px;
 }

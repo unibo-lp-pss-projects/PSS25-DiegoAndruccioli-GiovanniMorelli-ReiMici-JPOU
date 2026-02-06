@@ -14,8 +14,12 @@ import it.unibo.jpou.mvc.model.statistics.EnergyStatistic;
 import it.unibo.jpou.mvc.model.statistics.FunStatistic;
 import it.unibo.jpou.mvc.model.statistics.HealthStatistic;
 import it.unibo.jpou.mvc.model.statistics.HungerStatistic;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleIntegerProperty;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Main logic class for Pou.
@@ -39,6 +43,8 @@ public final class PouLogic {
     private final KitchenLogic kitchenLogic;
 
     private final PouStatisticsDecay decayLogic;
+
+    private final IntegerProperty age;
 
     /**
      * Initializes Pou with default statistics and state.
@@ -66,6 +72,8 @@ public final class PouLogic {
                 handleDeath();
             }
         });
+
+        this.age = new SimpleIntegerProperty(0);
     }
 
     /**
@@ -254,7 +262,7 @@ public final class PouLogic {
      */
     public void applyDecay() {
         if (canModify() || this.state.get() == PouState.SLEEPING) {
-            this.decayLogic.performDecay(this.hunger, this.energy, this.fun, this.health, this.state);
+            this.decayLogic.performDecay(this.hunger, this.energy, this.fun, this.health, this.state, this.age);
         }
     }
 
@@ -270,5 +278,31 @@ public final class PouLogic {
         this.fun.setValueStat(min);
         this.health.setValueStat(min);
         this.coins.setCoins(min);
+    }
+
+    /**
+     * Adds coins to the Pou entity.
+     *
+     * @param amount the amount of coins to add.
+     */
+    public void addCoins(final int amount) {
+        // prendo le monete attuali, aggiungo l'amount, e uso il setter.
+        // il setter si occupa già di controllare canModify().
+        setCoins(getCoins() + amount);
+    }
+
+    /**
+     * @return current age.
+     */
+    public int getAge() {
+        return this.age.get();
+    }
+
+    /**
+     * @return age property.
+     */
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "Property exposure is required for JavaFX binding")
+    public IntegerProperty ageProperty() {
+        return this.age;
     }
 }

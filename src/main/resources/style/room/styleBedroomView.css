@@ -1,7 +1,11 @@
 .bedroom-view {
-    -fx-background-color: #FFFF00; /* Yellow */
+    -fx-background-color: #FFFF00;
 }
 
-.night-mode {
-    -fx-background-color: #8B8000; /* Dark Yellow */
+.bedroom-view.night-mode {
+    -fx-background-color: #8B8000;
+}
+
+.bedroom-view.night-mode .selected-item-label {
+    -fx-text-fill: #FFFFFF;
 }

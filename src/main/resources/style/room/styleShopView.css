@@ -1,71 +1,38 @@
-.shop-view {
-    -fx-background-color: #f4f4f4;
+.shop-view-minimal {
+    -fx-background-color: #BBAAFF;
 }
 
-.shop-title {
-    -fx-font-size: 24px;
-    -fx-text-fill: #333333;
-    -fx-font-weight: bold;
+.simple-feedback {
+    -fx-font-size: 11px;
+    -fx-text-fill: #aaaaaa;
+    -fx-font-family: "Arial";
+    -fx-letter-spacing: 1px;
 }
 
-.shop-feedback-label {
-    -fx-font-size: 16px;
-    -fx-text-fill: #555555;
-    -fx-font-weight: bold;
-}
-
-.feedback-success {
-    -fx-text-fill: green;
-    -fx-font-weight: bold;
-}
-
-.feedback-error {
-    -fx-text-fill: red;
-    -fx-font-weight: bold;
-}
-
-.items-container {
-    -fx-padding: 20;
-    -fx-background-color: transparent;
-}
-
-.shop-scroll-pane {
-    -fx-background: transparent;
-    -fx-background-color: transparent;
-    -fx-padding: 0;
-}
-
-.shop-bottom-panel {
-    -fx-padding: 10;
-    -fx-background-color: #e0e0e0;
-    -fx-border-color: #cccccc;
-    -fx-border-width: 1 0 0 0;
-}
-
-.shop-back-button {
-    -fx-font-size: 14px;
-}
-
-.shop-item-button {
-    -fx-background-color: white;
-    -fx-border-color: #cccccc;
-    -fx-border-radius: 10;
-    -fx-background-radius: 10;
-    -fx-font-size: 14px;
-    -fx-text-fill: #333333;
+.rounded-card {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #eeeeee;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 15;
+    -fx-background-radius: 15;
+    -fx-min-width: 110;
+    -fx-min-height: 80;
     -fx-cursor: hand;
-    -fx-alignment: center;
-    -fx-text-alignment: center;
-    -fx-wrap-text: true;
-    -fx-min-width: 100px;
-    -fx-min-height: 80px;
 }
 
-.shop-item-button:hover {
-    -fx-background-color: #e0e0e0;
-    -fx-border-color: #999999;
+/* Hover: Feedback visivo sobrio */
+.rounded-card:hover {
+    -fx-border-color: #333333;
+    -fx-background-color: #fafafa;
 }
 
-.shop-item-button:pressed {
-    -fx-background-color: #d0d0d0;
+.card-name {
+    -fx-font-size: 13px;
+    -fx-text-fill: #333333;
+    -fx-font-weight: bold;
+}
+
+.card-price {
+    -fx-font-size: 11px;
+    -fx-text-fill: #777777;
 }
