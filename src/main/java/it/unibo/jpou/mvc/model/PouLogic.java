@@ -21,8 +21,6 @@ import javafx.beans.property.SimpleIntegerProperty;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import java.awt.*;
-
 /**
  * Main logic class for Pou.
  * Orchestrates interactions between Statistics, Logic components, and Items.

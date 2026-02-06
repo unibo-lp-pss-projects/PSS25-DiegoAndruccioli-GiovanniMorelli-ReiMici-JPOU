@@ -69,10 +69,8 @@ public final class MainView {
     /**
      * @return the root JavaFX node.
      */
-    @SuppressFBWarnings(
-            value = "EI_EXPOSE_REP",
-            justification = "JavaFX convention requires returning the root node for scene attachment."
-    )
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP",
+            justification = "JavaFX convention requires returning the root node for scene attachment.")
     public Parent getNode() {
         return this.rootStack;
     }
@@ -97,9 +95,9 @@ public final class MainView {
     /**
      * Updates a statistic bar.
      *
-     * @param key statistic name
+     * @param key      statistic name
      * @param progress value 0-1
-     * @param text label text
+     * @param text     label text
      */
     public void updateStat(final String key, final double progress, final String text) {
         this.topBar.updateStat(key, progress, text);
@@ -108,7 +106,7 @@ public final class MainView {
     /**
      * Sets the room change listener using Consumer.
      *
-     * @param room target room
+     * @param room     target room
      * @param listener callback
      */
     public void setOnRoomChange(final Room room, final Consumer<Room> listener) {
@@ -254,5 +252,23 @@ public final class MainView {
         if (visible) {
             this.gameOverOverlay.toFront();
         }
+    }
+
+    /**
+     * Sets the handler for the settings button action.
+     *
+     * @param handler the event handler to be invoked
+     */
+    public void setOnSettingsAction(final EventHandler<ActionEvent> handler) {
+        this.topBar.setOnSettingsAction(handler);
+    }
+
+    /**
+     * Sets the handler for the quit action in PauseOverlayView.
+     *
+     * @param handler the event handler to be invoked
+     */
+    public void setOnQuitAction(final EventHandler<ActionEvent> handler) {
+        this.pauseOverlay.setOnQuit(handler);
     }
 }
