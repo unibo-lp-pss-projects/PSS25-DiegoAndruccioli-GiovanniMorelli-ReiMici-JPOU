@@ -24,4 +24,14 @@ public record SavedInventory(List<SavedItem> items, List<String> unlockedSkins, 
         items = items != null ? List.copyOf(items) : Collections.emptyList();
         unlockedSkins = unlockedSkins != null ? List.copyOf(unlockedSkins) : Collections.emptyList();
     }
+
+    @Override
+    public List<SavedItem> items() {
+        return List.copyOf(items);
+    }
+
+    @Override
+    public List<String> unlockedSkins() {
+        return List.copyOf(unlockedSkins);
+    }
 }

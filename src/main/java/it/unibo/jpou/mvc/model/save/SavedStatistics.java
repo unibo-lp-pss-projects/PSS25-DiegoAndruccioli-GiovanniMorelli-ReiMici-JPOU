@@ -9,7 +9,8 @@ package it.unibo.jpou.mvc.model.save;
  * @param health current health level
  * @param coins  current amount of coins
  * @param state  current state of Pou (AWAKE/SLEEPING)
+ * @param age current age of Pou
  */
-public record SavedStatistics(int hunger, int energy, int fun, int health, int coins, String state) {
+public record SavedStatistics(int hunger, int energy, int fun, int health, int coins, String state, int age) {
 
 }
