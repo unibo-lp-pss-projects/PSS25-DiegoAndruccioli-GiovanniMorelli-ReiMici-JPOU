@@ -56,8 +56,7 @@ public final class PouGameLoop implements GameLoop {
                     this::tick,
                     0,
                     this.tickInterval,
-                    TimeUnit.SECONDS
-            );
+                    TimeUnit.SECONDS);
         }
     }
 
@@ -90,7 +89,7 @@ public final class PouGameLoop implements GameLoop {
     /**
      * Pauses the game engine execution.
      */
-    void pause() {
+    public void pause() {
         if (this.running) {
             this.running = false;
             if (this.currentTask != null) {
@@ -104,7 +103,7 @@ public final class PouGameLoop implements GameLoop {
      *
      * @param listener the action to run
      */
-    void addTickListener(final Runnable listener) {
+    public void addTickListener(final Runnable listener) {
         this.tickListeners.add(listener);
     }
 

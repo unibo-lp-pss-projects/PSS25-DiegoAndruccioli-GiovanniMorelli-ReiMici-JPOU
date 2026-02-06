@@ -21,6 +21,8 @@ import javafx.beans.property.SimpleIntegerProperty;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import java.awt.*;
+
 /**
  * Main logic class for Pou.
  * Orchestrates interactions between Statistics, Logic components, and Items.
@@ -286,8 +288,8 @@ public final class PouLogic {
      * @param amount the amount of coins to add.
      */
     public void addCoins(final int amount) {
-        // prendo le monete attuali, aggiungo l'amount, e uso il setter.
-        // il setter si occupa già di controllare canModify().
+        // Prendo le monete attuali, aggiungo amount, e uso il setter.
+        // Il setter si occupa già di controllare canModify().
         setCoins(getCoins() + amount);
     }
 
@@ -314,5 +316,21 @@ public final class PouLogic {
      */
     public void setAge(final int v) {
         this.age.set(Math.max(0, v));
+    }
+
+    /**
+     * Resets Pou to initial conditions.
+     */
+    public void reset() {
+        this.hunger.setValueStat(PouStatistics.STATISTIC_INITIAL_VALUE);
+        this.energy.setValueStat(PouStatistics.STATISTIC_INITIAL_VALUE);
+        this.fun.setValueStat(PouStatistics.STATISTIC_INITIAL_VALUE);
+        this.health.setValueStat(PouStatistics.STATISTIC_INITIAL_VALUE);
+
+        this.coins.setCoins(PouCoins.MIN_COINS);
+
+        this.state.set(PouState.AWAKE);
+
+        this.age.set(0);
     }
 }
