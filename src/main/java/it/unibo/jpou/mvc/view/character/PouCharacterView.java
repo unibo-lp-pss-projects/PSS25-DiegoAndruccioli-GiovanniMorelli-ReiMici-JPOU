@@ -1,5 +1,6 @@
 package it.unibo.jpou.mvc.view.character;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import javafx.beans.property.IntegerProperty;
 import javafx.scene.Group;
 import javafx.scene.shape.Ellipse;
@@ -79,6 +80,10 @@ public final class PouCharacterView extends Group {
     /**
      * @return the eyes component access.
      */
+    @SuppressFBWarnings(
+            value = "EI_EXPOSE_REP",
+            justification = "Eyes component needs to be accessible for animation and binding."
+    )
     public PouEyesComponent getEyes() {
         return this.eyes;
     }

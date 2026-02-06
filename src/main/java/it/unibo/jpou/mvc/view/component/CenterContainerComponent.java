@@ -19,6 +19,10 @@ public final class CenterContainerComponent extends StackPane {
      *
      * @param characterView the shared character view instance (Dependency Injection).
      */
+    @SuppressFBWarnings(
+            value = "EI_EXPOSE_REP2",
+            justification = "This component acts as a container for the shared CharacterView."
+    )
     public CenterContainerComponent(final PouCharacterView characterView) {
         this.getStyleClass().add("center-container");
         this.characterView = characterView;

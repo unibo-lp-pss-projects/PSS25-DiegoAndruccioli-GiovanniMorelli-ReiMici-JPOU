@@ -1,5 +1,6 @@
 package it.unibo.jpou.mvc.view;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import it.unibo.jpou.mvc.model.Room;
 import it.unibo.jpou.mvc.view.character.PouCharacterView;
 import it.unibo.jpou.mvc.view.component.BottomNavBarComponent;
@@ -68,6 +69,10 @@ public final class MainView {
     /**
      * @return the root JavaFX node.
      */
+    @SuppressFBWarnings(
+            value = "EI_EXPOSE_REP",
+            justification = "JavaFX convention requires returning the root node for scene attachment."
+    )
     public Parent getNode() {
         return this.rootStack;
     }
@@ -101,7 +106,7 @@ public final class MainView {
     }
 
     /**
-     * Sets the room change listener using Consumer (più pulito per il Controller).
+     * Sets the room change listener using Consumer.
      *
      * @param room target room
      * @param listener callback
@@ -174,17 +179,8 @@ public final class MainView {
     }
 
     /**
-     * Removes the minigame view from the interface.
+     * Shows a generic node as minigame (support for generic Node).
      *
-     * @param gameNode the visual root of the minigame to remove.
-     */
-    public void removeMinigame(final Parent gameNode) {
-        this.rootStack.getChildren().remove(gameNode);
-        this.mainLayout.requestFocus();
-    }
-
-    /**
-     * Shows a generic node as minigame (supporto per Node generici).
      * @param node the minigame view node.
      */
     public void showMinigame(final Node node) {
@@ -199,18 +195,48 @@ public final class MainView {
         }
     }
 
+    /**
+     * Removes the minigame view from the interface.
+     *
+     * @param gameNode the visual root of the minigame to remove.
+     */
+    public void removeMinigame(final Parent gameNode) {
+        this.rootStack.getChildren().remove(gameNode);
+        this.mainLayout.requestFocus();
+    }
+
+    /**
+     * Removes the minigame node from the interface.
+     *
+     * @param node the visual node of the minigame to remove.
+     */
     public void removeMinigame(final Node node) {
         this.rootStack.getChildren().remove(node);
     }
 
+    /**
+     * Sets the handler for the resume action in the pause overlay.
+     *
+     * @param handler the event handler to be invoked.
+     */
     public void setOnResumeAction(final EventHandler<ActionEvent> handler) {
         this.pauseOverlay.setOnResume(handler);
     }
 
+    /**
+     * Sets the handler for the restart action in the game over overlay.
+     *
+     * @param handler the event handler to be invoked.
+     */
     public void setOnRestartAction(final EventHandler<ActionEvent> handler) {
         this.gameOverOverlay.setOnRestart(handler);
     }
 
+    /**
+     * Sets the visibility of the pause overlay.
+     *
+     * @param visible true to show the pause overlay, false to hide it.
+     */
     public void setPauseVisible(final boolean visible) {
         this.pauseOverlay.setVisible(visible);
         if (visible) {
@@ -218,6 +244,11 @@ public final class MainView {
         }
     }
 
+    /**
+     * Sets the visibility of the game over overlay.
+     *
+     * @param visible true to show the game over overlay, false to hide it.
+     */
     public void setGameOverVisible(final boolean visible) {
         this.gameOverOverlay.setVisible(visible);
         if (visible) {
