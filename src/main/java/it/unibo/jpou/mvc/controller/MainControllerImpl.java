@@ -1,5 +1,6 @@
 package it.unibo.jpou.mvc.controller;
 
+import it.unibo.jpou.mvc.model.items.durable.skin.DefaultSkin;
 import it.unibo.jpou.mvc.controller.room.BedroomController;
 import it.unibo.jpou.mvc.controller.room.GameRoomController;
 import it.unibo.jpou.mvc.model.PouLogic;
@@ -64,6 +65,7 @@ public final class MainControllerImpl implements MainController {
         this.model = new PouLogic();
         this.model.setCoins(INITIAL_COINS);
         this.inventory = new InventoryImpl();
+        this.inventory.addItem(new DefaultSkin());
         this.gameLoop = new PouGameLoop();
 
         this.bedroomView = new BedroomView();
