@@ -9,6 +9,13 @@ import it.unibo.jpou.mvc.model.Room;
 import it.unibo.jpou.mvc.model.inventory.Inventory;
 import it.unibo.jpou.mvc.model.inventory.InventoryImpl;
 import it.unibo.jpou.mvc.view.MainView;
+import it.unibo.jpou.mvc.view.minigames.FruitCatcherJavaFXView;
+import it.unibo.jpou.mvc.view.minigames.FruitCatcherView;
+import it.unibo.jpou.mvc.view.room.BedroomView;
+import it.unibo.jpou.mvc.view.room.BathroomView;
+import it.unibo.jpou.mvc.view.room.GameRoomView;
+import it.unibo.jpou.mvc.view.room.KitchenView;
+import javafx.application.Platform;
 
 import java.util.Objects;
 import java.util.logging.Logger;
@@ -31,10 +38,11 @@ public final class MainControllerImpl implements MainController {
     private final InventoryController inventoryController;
 
     private final GameLoop gameLoop;
-    private final MainView mainView;
 
     private final BedroomView bedroomView;
     private final BathroomView bathroomView;
+    private final KitchenView kitchenView;
+    private final GameRoomView gameRoomView;
 
     //per scalabilita minigame
     private FruitCatcherController activeMinigame;
@@ -44,7 +52,6 @@ public final class MainControllerImpl implements MainController {
      *
      * @param view The main view instance (Present for compatibility, but currently
      *             ignored).
-     * @param view The main view instance.
      */
     public MainControllerImpl(final MainView view) {
 
@@ -59,13 +66,16 @@ public final class MainControllerImpl implements MainController {
 
         this.bedroomView = new BedroomView();
         this.bathroomView = new BathroomView();
+        this.kitchenView = new KitchenView();
+        this.gameRoomView = new GameRoomView();
 
         setupBedroomLogic();
         setupBathroomLogic();
+        setupGameRoomLogic();
         setupNavigation();
         setupGameLoop();
 
-        this.mainView.setRoom(this.bedroomView);
+        this.view.setRoom(this.bedroomView);
 
         LOGGER.info("[MainController] Logic System initialized.");
     }
@@ -94,9 +104,15 @@ public final class MainControllerImpl implements MainController {
         });
     }
 
+    private void setupGameRoomLogic() {
+        this.gameRoomView.setOnFruitCatcherAction(e -> this.startFruitCatcher());
+    }
+
     private void setupNavigation() {
-        this.mainView.setOnRoomChange(Room.BEDROOM, _ -> this.mainView.setRoom(this.bedroomView));
-        this.mainView.setOnRoomChange(Room.BATHROOM, _ -> this.mainView.setRoom(this.bathroomView));
+        this.view.setOnRoomChange(Room.BEDROOM, e -> this.view.setRoom(this.bedroomView));
+        this.view.setOnRoomChange(Room.BATHROOM, e -> this.view.setRoom(this.bathroomView));
+        this.view.setOnRoomChange(Room.KITCHEN, e -> this.view.setRoom(this.kitchenView));
+        this.view.setOnRoomChange(Room.GAME_ROOM, e -> this.view.setRoom(this.gameRoomView));
     }
 
     private void setupGameLoop() {
@@ -109,19 +125,18 @@ public final class MainControllerImpl implements MainController {
     }
 
     private void updateGlobalStatistics() {
-        this.mainView.updateStat("hunger",
+        this.view.updateStat("hunger",
                 (double) this.model.getHunger() / PouStatistics.STATISTIC_MAX_VALUE,
                 String.valueOf(this.model.getHunger()));
-        this.mainView.updateStat("energy",
+        this.view.updateStat("energy",
                 (double) this.model.getEnergy() / PouStatistics.STATISTIC_MAX_VALUE,
                 String.valueOf(this.model.getEnergy()));
-        this.mainView.updateStat("fun",
+        this.view.updateStat("fun",
                 (double) this.model.getFun() / PouStatistics.STATISTIC_MAX_VALUE,
                 String.valueOf(this.model.getFun()));
-        this.mainView.updateStat("health",
+        this.view.updateStat("health",
                 (double) this.model.getHealth() / PouStatistics.STATISTIC_MAX_VALUE,
                 String.valueOf(this.model.getHealth()));
-        LOGGER.info("[MainController] Logic System initialized.");
     }
 
     @Override
@@ -176,6 +191,8 @@ public final class MainControllerImpl implements MainController {
             this.activeMinigame = null;
 
             this.gameLoop.start();
+
+            updateGlobalStatistics();
         });
     }
 
