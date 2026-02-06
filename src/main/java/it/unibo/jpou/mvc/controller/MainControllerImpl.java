@@ -81,6 +81,9 @@ public final class MainControllerImpl implements MainController {
         this.gameLoop = new PouGameLoop();
 
         this.persistenceController = new PersistenceControllerImpl(this.model, this.inventory);
+
+        final String startingRoomName = this.persistenceController.loadGame();
+
         this.pauseController = new PauseControllerImpl(
                 this.gameLoop,
                 this.mainView,
@@ -151,10 +154,23 @@ public final class MainControllerImpl implements MainController {
             }
         });
 
-        this.mainView.setRoom(this.bedroomView);
-        this.bedroomView.updateView(this.model.getState());
+        AbstractRoomView startView = this.bedroomView;
+        if (startingRoomName != null) {
 
-        LOGGER.info("[MainController] Logic System initialized.");
+            try {
+                final Room savedRoom = Room.valueOf(startingRoomName);
+                startView = mapViewFromRoom(savedRoom);
+            } catch (final IllegalArgumentException e) {
+                LOGGER.warning("La stanza salvata non è valida " + startingRoomName);
+            }
+        }
+
+        changeRoom(startView);
+        if (startView instanceof BedroomView) {
+            this.bedroomView.updateView(this.model.getState());
+
+        }
+        LOGGER.info("Sistema logico inizializzato correttamente");
     }
 
     private void setupOverlayActions() {
@@ -221,6 +237,29 @@ public final class MainControllerImpl implements MainController {
         this.mainView.setRoom(newRoomView);
     }
 
+    /**
+     * It is used when reloading data to understand which room Pou was at the time of closing the previous session.
+     *
+     * @param room the enum taken from the save file
+     * @return the room that corresponds to the enum
+     */
+    private AbstractRoomView mapViewFromRoom(final Room room) {
+        return switch (room) {
+            case BATHROOM -> this.bathroomView;
+            case KITCHEN -> this.kitchenView;
+            case INFIRMARY -> this.infirmaryView;
+            case GAME_ROOM -> this.gameRoomView;
+            case SHOP -> this.shopView;
+            default -> this.bedroomView;
+        };
+    }
+
+    /**
+     * It is used when navigating within the game to understand which room Pou is in.
+     *
+     * @param view the room where it is located
+     * @return the enum of corresponding room
+     */
     private Room mapRoomFromView(final AbstractRoomView view) {
         if (view instanceof BedroomView) {
             return Room.BEDROOM;
