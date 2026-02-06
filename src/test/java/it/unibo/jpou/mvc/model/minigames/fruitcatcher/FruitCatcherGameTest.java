@@ -13,7 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class FruitCatcherGameTest {
 
-    private static final double GAME_WIDTH = 800.0;
+    // CORREZIONE: Allineato alla larghezza reale del gioco (400 invece di 800)
+    private static final double GAME_WIDTH = 400.0;
     private static final double PLAYER_BOUNDARY_OFFSET = 50.0;
     private static final double INITIAL_TIME = 60.0;
     private static final double TOLERANCE = 0.1;

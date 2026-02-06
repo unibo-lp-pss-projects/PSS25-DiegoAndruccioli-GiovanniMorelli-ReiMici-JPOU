@@ -2,8 +2,6 @@ package it.unibo.jpou.mvc.controller;
 
 import it.unibo.jpou.mvc.controller.minigames.FruitCatcherController;
 import it.unibo.jpou.mvc.controller.minigames.FruitCatcherControllerImpl;
-import it.unibo.jpou.mvc.controller.room.BathroomController;
-import it.unibo.jpou.mvc.controller.room.BedroomController;
 import it.unibo.jpou.mvc.model.PouLogic;
 import it.unibo.jpou.mvc.model.PouState;
 import it.unibo.jpou.mvc.model.PouStatistics;
@@ -20,7 +18,6 @@ import it.unibo.jpou.mvc.view.room.InfirmaryView;
 import it.unibo.jpou.mvc.view.room.KitchenView;
 import it.unibo.jpou.mvc.view.room.ShopView;
 import it.unibo.jpou.mvc.view.room.GameRoomView;
-import it.unibo.jpou.mvc.view.room.KitchenView;
 import javafx.application.Platform;
 
 import java.util.HashMap;
