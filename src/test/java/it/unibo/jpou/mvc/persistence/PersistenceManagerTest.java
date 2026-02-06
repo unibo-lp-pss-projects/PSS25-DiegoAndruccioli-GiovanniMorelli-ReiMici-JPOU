@@ -3,12 +3,12 @@ package it.unibo.jpou.mvc.persistence;
 import it.unibo.jpou.mvc.model.PouCoins;
 import it.unibo.jpou.mvc.model.PouState;
 import it.unibo.jpou.mvc.model.PouStatistics;
+import it.unibo.jpou.mvc.model.Room;
 import it.unibo.jpou.mvc.model.items.durable.skin.DefaultSkin;
 import it.unibo.jpou.mvc.model.items.durable.skin.GreenSkin;
 import it.unibo.jpou.mvc.model.items.durable.skin.RedSkin;
 import it.unibo.jpou.mvc.model.save.PouSaveData;
 import it.unibo.jpou.mvc.model.save.SavedInventory;
-import it.unibo.jpou.mvc.model.save.SavedItem;
 import it.unibo.jpou.mvc.model.save.SavedStatistics;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -20,6 +20,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -29,18 +30,13 @@ class PersistenceManagerTest {
 
     private static final int CUSTOM_STATISTICS = 60;
     private static final int CUSTOM_WALLET = 10_000;
-    private static final String CUSTOM_STATE = "SLEEPING";
-    private static final String DEFAULT_SKIN = "Default";
-    private static final String GREEN_SKIN = "Green Skin";
-    private static final String RED_SKIN = "Red Skin";
-    private static final String CUSTOM_ROOM = "BATHROOM";
 
     @TempDir
-    Path tempDir;
+    private Path tempDir;
 
     @Test
     void testLoadDefaultWhenFileMissing() {
-        final Path doesNotExistFile = tempDir.resolve("jpou-save.json");
+        final Path doesNotExistFile = tempDir.resolve("j-pou-save.json");
         final PersistenceManager manager = new PersistenceManager(doesNotExistFile);
 
         final PouSaveData data = manager.load();
@@ -61,24 +57,10 @@ class PersistenceManagerTest {
 
     @Test
     void testSaveAndLoad() throws IOException {
-        final Path saveFile = tempDir.resolve("jpou-test-save.json");
+        final Path saveFile = tempDir.resolve("j-pou-test-save.json");
         final PersistenceManager manager = new PersistenceManager(saveFile);
 
-        final SavedStatistics customStatistics = new SavedStatistics(
-                CUSTOM_STATISTICS,
-                CUSTOM_STATISTICS,
-                CUSTOM_STATISTICS,
-                CUSTOM_STATISTICS,
-                CUSTOM_WALLET,
-                CUSTOM_STATE
-        );
-
-        final SavedInventory customInventory = new SavedInventory(
-                Collections.emptyList(),
-                List.of(DEFAULT_SKIN, GREEN_SKIN, RED_SKIN), GREEN_SKIN
-        );
-
-        final PouSaveData dataToSave = new PouSaveData(customStatistics, customInventory, CUSTOM_ROOM);
+        final PouSaveData dataToSave = createCustomData();
 
         manager.save(dataToSave);
 
@@ -94,9 +76,49 @@ class PersistenceManagerTest {
                 () -> assertEquals(CUSTOM_STATISTICS, loadedData.statistics().fun()),
                 () -> assertEquals(CUSTOM_STATISTICS, loadedData.statistics().health()),
                 () -> assertEquals(CUSTOM_WALLET, loadedData.statistics().coins()),
-                () -> assertEquals(CUSTOM_STATE, loadedData.statistics().state()),
-                () -> assertEquals(GREEN_SKIN, loadedData.inventory().equippedSkin()),
-                () -> assertEquals(CUSTOM_ROOM, loadedData.currentRoom())
+                () -> assertEquals(PouState.SLEEPING.name(), loadedData.statistics().state()),
+                () -> assertEquals(GreenSkin.SKIN_NAME, loadedData.inventory().equippedSkin()),
+                () -> assertEquals(Room.BATHROOM.name(), loadedData.currentRoom())
                 );
+    }
+
+    private PouSaveData createCustomData() {
+        final SavedStatistics customStatistics = new SavedStatistics(
+                CUSTOM_STATISTICS,
+                CUSTOM_STATISTICS,
+                CUSTOM_STATISTICS,
+                CUSTOM_STATISTICS,
+                CUSTOM_WALLET,
+                PouState.SLEEPING.name()
+        );
+
+        final SavedInventory customInventory = new SavedInventory(
+                Collections.emptyList(),
+                List.of(DefaultSkin.DEFAULT_NAME, GreenSkin.SKIN_NAME, RedSkin.SKIN_NAME), GreenSkin.SKIN_NAME
+        );
+
+        return new PouSaveData(customStatistics, customInventory, Room.BATHROOM.name());
+    }
+
+    @Test
+    void testDefaultSavePath() {
+        final Path path = PersistenceManager.getDefaultSavePath();
+
+        assertAll("Il file dev'essere caricato nel percorso di default",
+                () -> assertNotNull(path, "Il percorso default non dev'essere null"),
+                () -> assertTrue(path.toString().endsWith("j-pou-save.json"))
+        );
+    }
+
+    @Test
+    void testDeleteSaveFile() throws IOException {
+        final Path saveFile = tempDir.resolve("delete-test.json");
+        final PersistenceManager manager = new PersistenceManager(saveFile);
+
+        manager.save(createCustomData());
+        assertTrue(exists(saveFile), "Il file deve esistere prima di eliminarlo");
+
+        manager.deleteSaveFile();
+        assertFalse(exists(saveFile), "Il file è stato eliminato");
     }
 }
