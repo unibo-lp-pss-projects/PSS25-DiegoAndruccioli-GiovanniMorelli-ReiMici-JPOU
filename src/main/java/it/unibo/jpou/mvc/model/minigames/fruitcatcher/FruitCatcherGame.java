@@ -14,18 +14,25 @@ import java.util.Random;
 public final class FruitCatcherGame implements Minigame {
 
     private static final int GAME_WIDTH = 400;
-    private static final int GAME_HEIGHT = 500;
-    private static final int OBJ_SIZE = 40;
+    private static final int GAME_HEIGHT = 550;
+    private static final int OBJ_SIZE = 35;
     private static final int PLAYER_SIZE = 60;
-    private static final double PLAYER_Y_POS = 400;
-    private static final double GRAVITY = 4.0;
+    private static final double PLAYER_Y_POS = 430;
+    private static final double GRAVITY = 2.5;
     private static final double MAX_TIME = 60.0;
     private static final double TIME_DECREMENT = 0.017;
 
     private static final double SPAWN_PROBABILITY = 0.02;
+
+    // 0.0 - 0.2: BOMBA (20%)
+    // 0.2 - 0.3: ANANAS (20%)
+    // 0.3 - 0.5: BANANA (10%)
+    // 0.5 - 1.0: MELA (50%)
     private static final double BOMB_CHANCE_THRESHOLD = 0.2;
-    private static final double BANANA_CHANCE_THRESHOLD = 0.4;
-    private static final double HITBOX_TOLERANCE_FACTOR = 1.5;
+    private static final double BANANA_CHANCE_THRESHOLD= 0.3;
+    private static final double PINEAPPLE_CHANCE_THRESHOLD = 0.5;
+
+    private static final double HITBOX_TOLERANCE_FACTOR = 1.0;
     private static final double PLAYER_BOUNDARY_OFFSET = 50.0;
 
     private final List<FallingObject> fallingObjects;
@@ -87,6 +94,8 @@ public final class FruitCatcherGame implements Minigame {
 
         if (chance < BOMB_CHANCE_THRESHOLD) {
             type = FallingObject.Type.BOMB;
+        } else if (chance < PINEAPPLE_CHANCE_THRESHOLD) {
+            type = FallingObject.Type.PINEAPPLE;
         } else if (chance < BANANA_CHANCE_THRESHOLD) {
             type = FallingObject.Type.BANANA;
         } else {
