@@ -97,7 +97,6 @@ public final class PouGameLoop implements GameLoop {
                 this.currentTask.cancel(false);
             }
         }
-
     }
 
     /**
