@@ -21,10 +21,10 @@ import java.util.List;
  */
 public final class FruitCatcherJavaFXView extends StackPane implements FruitCatcherView {
 
-    private static final double GAME_W = 800;
-    private static final double GAME_H = 600;
-    private static final double OBJ_SIZE = 40;
-    private static final double GRASS_HEIGHT = 50;
+    private static final double GAME_W = 400;
+    private static final double GAME_H = 500;
+    private static final double OBJ_SIZE = 25;
+    private static final double GRASS_HEIGHT = 40;
     private static final double PLAYER_Y_OFFSET = 100;
     private static final double PLAYER_SIZE = 60;
 

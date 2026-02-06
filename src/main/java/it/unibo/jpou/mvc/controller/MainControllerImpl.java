@@ -1,5 +1,7 @@
 package it.unibo.jpou.mvc.controller;
 
+import it.unibo.jpou.mvc.controller.minigames.FruitCatcherController;
+import it.unibo.jpou.mvc.controller.minigames.FruitCatcherControllerImpl;
 import it.unibo.jpou.mvc.controller.room.BathroomController;
 import it.unibo.jpou.mvc.controller.room.BedroomController;
 import it.unibo.jpou.mvc.model.PouLogic;
@@ -9,10 +11,11 @@ import it.unibo.jpou.mvc.model.Room;
 import it.unibo.jpou.mvc.model.inventory.Inventory;
 import it.unibo.jpou.mvc.model.inventory.InventoryImpl;
 import it.unibo.jpou.mvc.view.MainView;
+import it.unibo.jpou.mvc.view.minigames.FruitCatcherJavaFXView;
+import it.unibo.jpou.mvc.view.minigames.FruitCatcherView;
 import it.unibo.jpou.mvc.view.room.AbstractRoomView;
 import it.unibo.jpou.mvc.view.room.BathroomView;
 import it.unibo.jpou.mvc.view.room.BedroomView;
-import it.unibo.jpou.mvc.view.room.BathroomView;
 import it.unibo.jpou.mvc.view.room.GameRoomView;
 import it.unibo.jpou.mvc.view.room.KitchenView;
 import javafx.application.Platform;
@@ -53,7 +56,6 @@ public final class MainControllerImpl implements MainController {
      * @param view The main view instance (Present for compatibility, but currently
      *             ignored).
      */
-
     public MainControllerImpl(final MainView view) {
 
         this.mainView = Objects.requireNonNull(view, "View cannot be null");
@@ -70,20 +72,27 @@ public final class MainControllerImpl implements MainController {
 
         this.shopController = new ShopControllerImpl(this.model, this.inventory);
         this.inventoryController = new InventoryControllerImpl(this.model, this.inventory);
+
         new BathroomController(this.model, this.bathroomView, this::updateGlobalStatistics);
         new BedroomController(this.model, this.bedroomView, this.mainView);
 
+        setupGameRoomLogic();
         setupNavigation();
         setupGameLoop();
-
-        this.mainView.setRoom(this.bedroomView);
-
+        //this.mainView.setRoom(this.bedroomView);
+        this.mainView.setRoom(this.gameRoomView);
         LOGGER.info("[MainController] Logic System initialized.");
+    }
+
+    private void setupGameRoomLogic() {
+        this.gameRoomView.setOnFruitCatcherAction(e -> this.startFruitCatcher());
     }
 
     private void setupNavigation() {
         this.mainView.setOnRoomChange(Room.BEDROOM, _ -> changeRoom(this.bedroomView));
         this.mainView.setOnRoomChange(Room.BATHROOM, _ -> changeRoom(this.bathroomView));
+        this.mainView.setOnRoomChange(Room.KITCHEN, _ -> changeRoom(this.kitchenView));
+        this.mainView.setOnRoomChange(Room.GAME_ROOM, _ -> changeRoom(this.gameRoomView));
     }
 
     private void setupGameLoop() {
@@ -153,19 +162,18 @@ public final class MainControllerImpl implements MainController {
     public void startFruitCatcher() {
         LOGGER.info("[MainController] Starting Fruit Catcher...");
 
+        //ferma loop principale
         this.gameLoop.shutdown();
 
         final FruitCatcherView minigameView = new FruitCatcherJavaFXView();
 
         this.activeMinigame = new FruitCatcherControllerImpl(minigameView, coins -> {
             LOGGER.info("Minigame finished. Coins won: " + coins);
-
             this.model.addCoins(coins);
-
             closeMinigame(minigameView);
         });
 
-        this.view.showMinigame(minigameView.getNode());
+        this.mainView.showMinigame(minigameView.getNode());
 
         this.activeMinigame.start();
     }
@@ -177,7 +185,7 @@ public final class MainControllerImpl implements MainController {
      */
     private void closeMinigame(final FruitCatcherView minigameView) {
         Platform.runLater(() -> {
-            this.view.removeMinigame(minigameView.getNode());
+            this.mainView.removeMinigame(minigameView.getNode());
 
             this.activeMinigame = null;
 

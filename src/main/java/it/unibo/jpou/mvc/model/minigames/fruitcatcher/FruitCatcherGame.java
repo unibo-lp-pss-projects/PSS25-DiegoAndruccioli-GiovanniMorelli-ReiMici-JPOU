@@ -13,11 +13,11 @@ import java.util.Random;
  */
 public final class FruitCatcherGame implements Minigame {
 
-    private static final int GAME_WIDTH = 800;
-    private static final int GAME_HEIGHT = 600;
+    private static final int GAME_WIDTH = 400;
+    private static final int GAME_HEIGHT = 500;
     private static final int OBJ_SIZE = 40;
     private static final int PLAYER_SIZE = 60;
-    private static final double PLAYER_Y_POS = 500;
+    private static final double PLAYER_Y_POS = 400;
     private static final double GRAVITY = 4.0;
     private static final double MAX_TIME = 60.0;
     private static final double TIME_DECREMENT = 0.017;
