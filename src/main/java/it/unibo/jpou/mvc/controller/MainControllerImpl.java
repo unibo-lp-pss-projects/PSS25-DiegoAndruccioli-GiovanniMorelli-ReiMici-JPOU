@@ -1,5 +1,9 @@
 package it.unibo.jpou.mvc.controller;
 
+import it.unibo.jpou.mvc.controller.overlay.GameOverController;
+import it.unibo.jpou.mvc.controller.overlay.GameOverControllerImpl;
+import it.unibo.jpou.mvc.controller.overlay.PauseController;
+import it.unibo.jpou.mvc.controller.overlay.PauseControllerImpl;
 import it.unibo.jpou.mvc.controller.room.BathroomController;
 import it.unibo.jpou.mvc.controller.room.BedroomController;
 import it.unibo.jpou.mvc.controller.room.GameRoomController;
@@ -57,6 +61,12 @@ public final class MainControllerImpl implements MainController {
     @SuppressWarnings("PMD.UnusedPrivateField")
     private final BathroomController bathroomController;
 
+    private final PersistenceController persistenceController;
+    private final PauseController pauseController;
+    private final GameOverController gameOverController;
+
+    private Room currentRoom = Room.BEDROOM;
+
     /**
      * Constructs the logical system and wires dependencies.
      *
@@ -70,6 +80,17 @@ public final class MainControllerImpl implements MainController {
         this.inventory = new InventoryImpl();
         this.gameLoop = new PouGameLoop();
 
+        this.persistenceController = new PersistenceControllerImpl(this.model, this.inventory);
+        this.pauseController = new PauseControllerImpl(
+                this.gameLoop,
+                this.mainView,
+                this.persistenceController,
+                () -> this.currentRoom);
+        this.gameOverController = new GameOverControllerImpl(
+                this.gameLoop,
+                this.mainView,
+                this.model
+        );
         this.bedroomView = new BedroomView();
         this.bathroomView = new BathroomView();
         this.kitchenView = new KitchenView();
@@ -81,36 +102,31 @@ public final class MainControllerImpl implements MainController {
                 this.model,
                 this.bedroomView,
                 this.mainView,
-                this.inventory
-        );
+                this.inventory);
 
         this.bathroomController = new BathroomController(
                 this.model,
                 this.bathroomView,
-                () -> Platform.runLater(this::updateGlobalStatistics)
-        );
+                () -> Platform.runLater(this::updateGlobalStatistics));
 
         this.kitchenController = new KitchenController(
                 this.model,
                 this.inventory,
                 this.kitchenView,
-                () -> Platform.runLater(this::updateGlobalStatistics)
-        );
+                () -> Platform.runLater(this::updateGlobalStatistics));
 
         this.infirmaryController = new InfirmaryController(
                 this.model,
                 this.inventory,
                 this.infirmaryView,
-                () -> Platform.runLater(this::updateGlobalStatistics)
-        );
+                () -> Platform.runLater(this::updateGlobalStatistics));
 
         this.gameRoomController = new GameRoomController(
                 this.model,
                 this.gameRoomView,
                 this.mainView,
                 this.gameLoop,
-                () -> Platform.runLater(this::updateGlobalStatistics)
-        );
+                () -> Platform.runLater(this::updateGlobalStatistics));
 
         final ShopController shopCtrl = new ShopControllerImpl(this.model, this.inventory);
         final InventoryController invCtrl = new InventoryControllerImpl(this.model, this.inventory);
@@ -119,6 +135,7 @@ public final class MainControllerImpl implements MainController {
 
         setupNavigation();
         setupGameLoop();
+        setupOverlayActions();
 
         this.mainView.bindPouAge(this.model.ageProperty());
         this.mainView.setPouSkinColor(this.model.getSkin().getColorHex());
@@ -128,10 +145,29 @@ public final class MainControllerImpl implements MainController {
             }
         });
 
+        this.model.stateProperty().addListener((_, _, newState) -> {
+            if (newState == PouState.DEAD) {
+                handleDeath();
+            }
+        });
+
         this.mainView.setRoom(this.bedroomView);
         this.bedroomView.updateView(this.model.getState());
 
         LOGGER.info("[MainController] Logic System initialized.");
+    }
+
+    private void setupOverlayActions() {
+        this.mainView.setOnSettingsAction(_ -> this.pauseController.pause());
+        this.mainView.setOnResumeAction(_ -> this.pauseController.resume());
+        this.mainView.setOnQuitAction(_ -> this.pauseController.quit());
+
+        this.mainView.setOnRestartAction(_ -> this.gameOverController.restart());
+    }
+
+    private void handleDeath() {
+        this.gameLoop.shutdown();
+        Platform.runLater(() -> this.mainView.setGameOverVisible(true));
     }
 
     private void setupNavigation() {
@@ -173,6 +209,7 @@ public final class MainControllerImpl implements MainController {
             this.bedroomView.updateView(PouState.AWAKE);
         }
 
+        this.currentRoom = mapRoomFromView(newRoomView);
         this.mainView.setCharacterVisible(!(newRoomView instanceof ShopView));
 
         if (newRoomView instanceof ShopView) {
@@ -182,6 +219,23 @@ public final class MainControllerImpl implements MainController {
         }
 
         this.mainView.setRoom(newRoomView);
+    }
+
+    private Room mapRoomFromView(final AbstractRoomView view) {
+        if (view instanceof BedroomView) {
+            return Room.BEDROOM;
+        } else if (view instanceof BathroomView) {
+            return Room.BATHROOM;
+        } else if (view instanceof GameRoomView) {
+            return Room.GAME_ROOM;
+        } else if (view instanceof InfirmaryView) {
+            return Room.INFIRMARY;
+        } else if (view instanceof KitchenView) {
+            return Room.KITCHEN;
+        } else if (view instanceof ShopView) {
+            return Room.SHOP;
+        }
+        return Room.BEDROOM;
     }
 
     private void updateRoomData(final AbstractRoomView currentView) {
