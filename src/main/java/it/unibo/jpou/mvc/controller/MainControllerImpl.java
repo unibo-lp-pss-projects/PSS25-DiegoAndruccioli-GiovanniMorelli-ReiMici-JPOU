@@ -1,17 +1,16 @@
 package it.unibo.jpou.mvc.controller;
 
-import it.unibo.jpou.mvc.model.items.durable.skin.DefaultSkin;
+import it.unibo.jpou.mvc.controller.room.BathroomController;
 import it.unibo.jpou.mvc.controller.room.BedroomController;
 import it.unibo.jpou.mvc.controller.room.GameRoomController;
+import it.unibo.jpou.mvc.controller.room.InfirmaryController;
+import it.unibo.jpou.mvc.controller.room.KitchenController;
 import it.unibo.jpou.mvc.model.PouLogic;
 import it.unibo.jpou.mvc.model.PouState;
 import it.unibo.jpou.mvc.model.PouStatistics;
 import it.unibo.jpou.mvc.model.Room;
 import it.unibo.jpou.mvc.model.inventory.Inventory;
 import it.unibo.jpou.mvc.model.inventory.InventoryImpl;
-import it.unibo.jpou.mvc.model.items.consumable.food.Food;
-import it.unibo.jpou.mvc.model.items.consumable.potion.Potion;
-import it.unibo.jpou.mvc.model.items.durable.skin.Skin;
 import it.unibo.jpou.mvc.view.MainView;
 import it.unibo.jpou.mvc.view.room.AbstractRoomView;
 import it.unibo.jpou.mvc.view.room.BathroomView;
@@ -22,11 +21,9 @@ import it.unibo.jpou.mvc.view.room.ShopView;
 import it.unibo.jpou.mvc.view.room.GameRoomView;
 import javafx.application.Platform;
 
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 /**
  * Implementation of the Main Controller acting as the Logic Orchestrator.
@@ -53,6 +50,12 @@ public final class MainControllerImpl implements MainController {
     private final GameRoomView gameRoomView;
 
     private final GameRoomController gameRoomController;
+    private final KitchenController kitchenController;
+    private final InfirmaryController infirmaryController;
+    private final BedroomController bedroomController;
+
+    @SuppressWarnings("PMD.UnusedPrivateField")
+    private final BathroomController bathroomController;
 
     /**
      * Constructs the logical system and wires dependencies.
@@ -65,7 +68,6 @@ public final class MainControllerImpl implements MainController {
         this.model = new PouLogic();
         this.model.setCoins(INITIAL_COINS);
         this.inventory = new InventoryImpl();
-        this.inventory.addItem(new DefaultSkin());
         this.gameLoop = new PouGameLoop();
 
         this.bedroomView = new BedroomView();
@@ -75,13 +77,32 @@ public final class MainControllerImpl implements MainController {
         this.gameRoomView = new GameRoomView();
         this.shopView = new ShopView();
 
-        new BedroomController(this.model, this.bedroomView, this.mainView, this.inventory);
+        this.bedroomController = new BedroomController(
+                this.model,
+                this.bedroomView,
+                this.mainView,
+                this.inventory
+        );
 
-        final ShopController shopCtrl = new ShopControllerImpl(this.model, this.inventory);
-        final InventoryController invCtrl = new InventoryControllerImpl(this.model, this.inventory);
+        this.bathroomController = new BathroomController(
+                this.model,
+                this.bathroomView,
+                () -> Platform.runLater(this::updateGlobalStatistics)
+        );
 
-        this.shopControllerSupplier = () -> shopCtrl;
-        this.inventoryControllerSupplier = () -> invCtrl;
+        this.kitchenController = new KitchenController(
+                this.model,
+                this.inventory,
+                this.kitchenView,
+                () -> Platform.runLater(this::updateGlobalStatistics)
+        );
+
+        this.infirmaryController = new InfirmaryController(
+                this.model,
+                this.inventory,
+                this.infirmaryView,
+                () -> Platform.runLater(this::updateGlobalStatistics)
+        );
 
         this.gameRoomController = new GameRoomController(
                 this.model,
@@ -91,12 +112,15 @@ public final class MainControllerImpl implements MainController {
                 () -> Platform.runLater(this::updateGlobalStatistics)
         );
 
+        final ShopController shopCtrl = new ShopControllerImpl(this.model, this.inventory);
+        final InventoryController invCtrl = new InventoryControllerImpl(this.model, this.inventory);
+        this.shopControllerSupplier = () -> shopCtrl;
+        this.inventoryControllerSupplier = () -> invCtrl;
+
         setupNavigation();
         setupGameLoop();
-        setupConsumableHandlers();
 
         this.mainView.bindPouAge(this.model.ageProperty());
-
         this.mainView.setPouSkinColor(this.model.getSkin().getColorHex());
         this.model.skinProperty().addListener((obs, oldSkin, newSkin) -> {
             if (newSkin != null) {
@@ -106,6 +130,7 @@ public final class MainControllerImpl implements MainController {
 
         this.mainView.setRoom(this.bedroomView);
         this.bedroomView.updateView(this.model.getState());
+
         LOGGER.info("[MainController] Logic System initialized.");
     }
 
@@ -142,29 +167,6 @@ public final class MainControllerImpl implements MainController {
                 String.valueOf(this.model.getHealth()));
     }
 
-    private void setupConsumableHandlers() {
-        this.kitchenView.setOnEat(food -> {
-            try {
-                this.model.eat(food);
-                this.inventory.consumeItem(food);
-                updateRoomData(this.kitchenView);
-                updateGlobalStatistics();
-            } catch (final IllegalArgumentException e) {
-                LOGGER.warning("Eat failed: " + e.getMessage());
-            }
-        });
-        this.infirmaryView.setOnUsePotion(potion -> {
-            try {
-                this.model.usePotion(potion);
-                this.inventory.consumeItem(potion);
-                updateRoomData(this.infirmaryView);
-                updateGlobalStatistics();
-            } catch (final IllegalArgumentException e) {
-                LOGGER.warning("Potion failed: " + e.getMessage());
-            }
-        });
-    }
-
     private void changeRoom(final AbstractRoomView newRoomView) {
         if (!(newRoomView instanceof BedroomView) && this.model.getState() == PouState.SLEEPING) {
             this.model.wakeUp();
@@ -184,21 +186,11 @@ public final class MainControllerImpl implements MainController {
 
     private void updateRoomData(final AbstractRoomView currentView) {
         if (currentView instanceof KitchenView) {
-            final Map<Food, Integer> foodMap = this.inventory.getConsumables().entrySet().stream()
-                    .filter(entry -> entry.getKey() instanceof Food)
-                    .collect(Collectors.toMap(e -> (Food) e.getKey(), Map.Entry::getValue));
-            ((KitchenView) currentView).refreshFood(foodMap);
+            this.kitchenController.refreshView();
         } else if (currentView instanceof InfirmaryView) {
-            final Map<Potion, Integer> potionMap = this.inventory.getConsumables().entrySet().stream()
-                    .filter(entry -> entry.getKey() instanceof Potion)
-                    .collect(Collectors.toMap(e -> (Potion) e.getKey(), Map.Entry::getValue));
-            ((InfirmaryView) currentView).refreshPotions(potionMap);
+            this.infirmaryController.refreshView();
         } else if (currentView instanceof BedroomView) {
-            final Map<Skin, Integer> skinMap = this.inventory.getDurables().stream()
-                    .filter(item -> item instanceof Skin)
-                    .map(item -> (Skin) item)
-                    .collect(Collectors.toMap(skin -> skin, _ -> 1));
-            ((BedroomView) currentView).refreshSkins(skinMap);
+            this.bedroomController.refreshView();
         }
     }
 
@@ -211,11 +203,9 @@ public final class MainControllerImpl implements MainController {
     @Override
     public void stop() {
         this.gameLoop.shutdown();
-
         if (this.gameRoomController != null) {
             this.gameRoomController.shutdown();
         }
-
         LOGGER.info("[MainController] GameLoop stopped.");
     }
 

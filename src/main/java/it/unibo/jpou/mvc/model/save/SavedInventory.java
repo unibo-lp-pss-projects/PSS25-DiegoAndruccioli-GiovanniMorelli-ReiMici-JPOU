@@ -24,6 +24,7 @@ public record SavedInventory(List<SavedItem> items, List<String> unlockedSkins, 
         items = items != null ? List.copyOf(items) : Collections.emptyList();
         unlockedSkins = unlockedSkins != null ? List.copyOf(unlockedSkins) : Collections.emptyList();
     }
+
     /**
      * Returns an unmodifiable view of the saved items.
      *
@@ -40,7 +41,7 @@ public record SavedInventory(List<SavedItem> items, List<String> unlockedSkins, 
      * @return unmodifiable list of save skins
      */
     @Override
-    public  List <String> unlockedSkins() {
+    public List<String> unlockedSkins() {
         return Collections.unmodifiableList(unlockedSkins);
     }
 }

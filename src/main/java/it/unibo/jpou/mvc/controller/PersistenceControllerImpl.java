@@ -99,7 +99,8 @@ public class PersistenceControllerImpl implements PersistenceController {
                 this.model.getFun(),
                 this.model.getHealth(),
                 this.model.getCoins(),
-                this.model.getState().name()
+                this.model.getState().name(),
+                0
         );
 
         /* saving consumable data */

@@ -1,5 +1,6 @@
 package it.unibo.jpou.mvc.controller.room;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import it.unibo.jpou.mvc.model.PouLogic;
 import it.unibo.jpou.mvc.model.PouState;
 import it.unibo.jpou.mvc.view.MainView;
@@ -18,46 +19,62 @@ public final class BedroomController {
 
     private static final Logger LOGGER = Logger.getLogger(BedroomController.class.getName());
 
+    private final PouLogic model;
+    private final BedroomView view;
+    private final MainView mainView;
+    private final Inventory inventory;
+
     /**
-     * @param model the game model.
-     * @param view the bedroom view.
-     * @param mainView the main container view.
+     * @param model     the game model.
+     * @param view      the bedroom view.
+     * @param mainView  the main container view.
      * @param inventory the player inventory.
      */
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Standard Dependency Injection pattern")
     public BedroomController(final PouLogic model, final BedroomView view,
                              final MainView mainView, final Inventory inventory) {
-        setupLogic(model, view, mainView, inventory);
+        this.model = model;
+        this.view = view;
+        this.mainView = mainView;
+        this.inventory = inventory;
+
+        setupLogic();
     }
 
-    private void setupLogic(final PouLogic model, final BedroomView view,
-                            final MainView mainView, final Inventory inventory) {
-        // ... (resto del codice invariato, assicurati che i parametri siano final) ...
-        // Per brevità non incollo tutto il body, ma aggiungi 'final' a 'view' e 'inventory' se mancano
-        model.stateProperty().addListener((_, _, newState) -> {
+    private void setupLogic() {
+        this.model.stateProperty().addListener((_, _, newState) -> {
             Platform.runLater(() -> {
-                view.updateView(newState);
-                mainView.setPouSleeping(newState == PouState.SLEEPING);
+                this.view.updateView(newState);
+                this.mainView.setPouSleeping(newState == PouState.SLEEPING);
             });
         });
-        view.setOnActionHandler(_ -> {
-            if (model.getState() == PouState.SLEEPING) {
-                model.wakeUp();
+
+        this.view.setOnActionHandler(_ -> {
+            if (this.model.getState() == PouState.SLEEPING) {
+                this.model.wakeUp();
             } else {
-                model.sleep();
+                this.model.sleep();
             }
         });
-        refreshWardrobe(view, inventory);
-        view.setOnSkinSelected(skin -> {
-            model.setSkin(skin);
+
+        refreshView();
+
+        this.view.setOnSkinSelected(skin -> {
+            this.model.setSkin(skin);
             LOGGER.info("Pou skin changed to: " + skin.getName());
         });
     }
 
-    private void refreshWardrobe(final BedroomView view, final Inventory inventory) {
-        final Map<Skin, Integer> ownedSkins = inventory.getDurables().stream()
+    /**
+     * Refreshes the wardrobe content based on the current inventory.
+     * Use this method to update the view when inventory changes.
+     */
+    public void refreshView() {
+        final Map<Skin, Integer> ownedSkins = this.inventory.getDurables().stream()
                 .filter(item -> item instanceof Skin)
                 .map(item -> (Skin) item)
                 .collect(Collectors.toMap(skin -> skin, _ -> 1));
-        view.refreshSkins(ownedSkins);
+
+        this.view.refreshSkins(ownedSkins);
     }
 }
