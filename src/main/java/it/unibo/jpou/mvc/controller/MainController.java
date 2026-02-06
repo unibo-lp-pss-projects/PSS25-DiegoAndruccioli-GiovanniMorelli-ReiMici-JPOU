@@ -30,4 +30,12 @@ public interface MainController {
      * @return the inventory controller instance.
      */
     InventoryController getInventoryController();
+
+    /**
+     * Returns the task to start the fruit catcher game.
+     * Useful for binding view actions to controller logic.
+     *
+     * @return a runnable task.
+     */
+    Runnable getFruitCatcherStarter();
 }

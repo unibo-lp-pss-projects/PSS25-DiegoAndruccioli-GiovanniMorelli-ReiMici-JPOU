@@ -1,11 +1,16 @@
 package it.unibo.jpou.mvc.view.room;
 
-import it.unibo.jpou.mvc.model.items.Item;
 import it.unibo.jpou.mvc.model.items.consumable.potion.Potion;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -15,9 +20,15 @@ import java.util.function.Consumer;
  */
 public final class InfirmaryView extends AbstractRoomView {
 
+    private static final int TOP_PADDING = 50;
     private final Label feedbackLabel;
-    private final Button usePotionButton;
-    private final Button inventoryButton;
+    private final Button healButton;
+    private final Button nextItemButton;
+
+    private List<Potion> availablePotions = new ArrayList<>();
+    private Map<Potion, Integer> potionQuantities = new HashMap<>();
+    private int currentIndex = -1;
+    private Potion currentSelectedPotion;
 
     private Consumer<Potion> onUsePotionAction;
 
@@ -27,57 +38,83 @@ public final class InfirmaryView extends AbstractRoomView {
     public InfirmaryView() {
         super("Infirmary");
 
-        this.getStylesheets().add(
-                Objects.requireNonNull(getClass().getResource("/style/room/styleInfirmaryView.css"))
-                        .toExternalForm());
-        this.getStylesheets().add(
-                Objects.requireNonNull(getClass().getResource("/style/room/defaultRoom.css"))
-                        .toExternalForm());
+        this.getStylesheets().add(Objects.requireNonNull(getClass()
+                .getResource("/style/room/styleInfirmaryView.css")).toExternalForm());
+        this.getStylesheets().add(Objects.requireNonNull(getClass()
+                .getResource("/style/room/defaultRoom.css")).toExternalForm());
         this.getStyleClass().add("infirmary-view");
 
-        final StackPane centerLayout = new StackPane();
-        this.feedbackLabel = new Label("Pou feels sick?");
-        this.feedbackLabel.getStyleClass().add("feedback-label");
-        centerLayout.getChildren().add(feedbackLabel);
-        this.getChildren().add(centerLayout);
+        final VBox topContainer = new VBox();
+        topContainer.setAlignment(Pos.CENTER);
+        topContainer.setPadding(new Insets(TOP_PADDING, 0, 0, 0));
 
-        this.usePotionButton = new Button("Heal");
-        this.usePotionButton.getStyleClass().add("action-button");
+        this.feedbackLabel = new Label("Medicine cabinet empty.");
+        this.feedbackLabel.getStyleClass().add("selected-potion-label");
 
-        this.inventoryButton = new Button("Inventory");
-        this.inventoryButton.getStyleClass().add("action-button");
+        topContainer.getChildren().add(feedbackLabel);
+        this.setTop(topContainer);
 
-        this.usePotionButton.setOnAction(_ -> {
-            if (this.onUsePotionAction != null) {
-                this.feedbackLabel.setText("Healing...");
-            } else {
-                this.feedbackLabel.setText("Gulp! (Demo)");
-            }
-        });
+        this.healButton = new Button("USE POTION");
+        this.healButton.getStyleClass().add("action-button");
+        this.healButton.setDisable(true);
 
-        this.getActionBar().getChildren().addAll(this.usePotionButton, this.inventoryButton);
+        this.nextItemButton = new Button("NEXT ITEM");
+        this.nextItemButton.getStyleClass().add("action-button");
+
+        this.nextItemButton.setOnAction(_ -> scrollNextItem());
+        this.healButton.setOnAction(_ -> triggerHeal());
+
+        this.getActionBar().getChildren().addAll(this.healButton, this.nextItemButton);
     }
 
     /**
-     * Updates the view based on inventory.
+     * Refresh the potions displayed.
      *
-     * @param inventory The current inventory state.
+     * @param potions map of potions.
      */
-    public void refreshItems(final Map<Item, Integer> inventory) {
-        // FIX: Variable 'hasPotions' should be final
-        final boolean hasPotions = inventory.keySet().stream().anyMatch(i -> i instanceof Potion);
+    public void refreshPotions(final Map<Potion, Integer> potions) {
+        this.potionQuantities = new HashMap<>(potions);
+        this.availablePotions = new ArrayList<>(potions.keySet());
 
-        if (!hasPotions) {
-            this.feedbackLabel.setText("No medicine available.");
+        if (this.availablePotions.isEmpty()) {
+            this.currentIndex = -1;
+            this.currentSelectedPotion = null;
+            this.feedbackLabel.setText("Medicine cabinet empty.");
+            this.healButton.setDisable(true);
         } else {
-            this.feedbackLabel.setText("You have potions ready.");
+            if (this.currentIndex < 0 || this.currentIndex >= this.availablePotions.size()) {
+                this.currentIndex = 0;
+            }
+            this.currentSelectedPotion = this.availablePotions.get(this.currentIndex);
+            this.healButton.setDisable(false);
+            updateDisplay();
+        }
+    }
+
+    private void scrollNextItem() {
+        if (!this.availablePotions.isEmpty()) {
+            this.currentIndex = (this.currentIndex + 1) % this.availablePotions.size();
+            this.currentSelectedPotion = this.availablePotions.get(this.currentIndex);
+            updateDisplay();
+        }
+    }
+
+    private void updateDisplay() {
+        if (this.currentSelectedPotion != null) {
+            final String name = this.currentSelectedPotion.getName().toUpperCase(Locale.ROOT);
+            final int qty = this.potionQuantities.get(this.currentSelectedPotion);
+            this.feedbackLabel.setText(name + " (x" + qty + ")");
+        }
+    }
+
+    private void triggerHeal() {
+        if (this.currentSelectedPotion != null && this.onUsePotionAction != null) {
+            this.onUsePotionAction.accept(this.currentSelectedPotion);
         }
     }
 
     /**
-     * Sets the handler for when a potion is used.
-     *
-     * @param listener The callback.
+     * @param listener handler for potion use.
      */
     public void setOnUsePotion(final Consumer<Potion> listener) {
         this.onUsePotionAction = listener;

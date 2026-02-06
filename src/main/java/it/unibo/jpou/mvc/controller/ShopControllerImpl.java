@@ -40,17 +40,13 @@ public final class ShopControllerImpl implements ShopController {
 
     @Override
     public void populateShop(final ShopView view) {
+        // Creiamo la mappa partendo dalla ShopFactory (tramite il modello shopModel)
         final Map<Item, Integer> viewCatalog = new HashMap<>();
         for (final Item item : this.shopModel.getAvailableItems()) {
             viewCatalog.put(item, item.getPrice());
         }
 
-        final Consumer<Item> onBuy = item ->
-                this.executePurchase(item, view::setFeedbackText);
-
-        view.populateShop(viewCatalog, onBuy);
-
-        view.setFeedbackText("Coins: " + this.pouLogicSupplier.get().getCoins() + " $");
+        view.populateShop(viewCatalog, this::buyItem);
     }
 
     @Override
