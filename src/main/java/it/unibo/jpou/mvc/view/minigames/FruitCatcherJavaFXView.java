@@ -1,6 +1,9 @@
 package it.unibo.jpou.mvc.view.minigames;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import it.unibo.jpou.mvc.model.minigames.fruitcatcher.FallingObject;
+import it.unibo.jpou.mvc.view.character.PouCharacterView;
+
 import javafx.event.EventHandler;
 import javafx.scene.Parent;
 import javafx.scene.canvas.Canvas;
@@ -28,6 +31,10 @@ public final class FruitCatcherJavaFXView extends StackPane implements FruitCatc
     private static final double PLAYER_Y_OFFSET = 100;
     private static final double PLAYER_SIZE = 60;
 
+    private static final double POU_ORIGINAL_WIDTH = 140.0;
+
+    private static final double VISUAL_OFFSET_CORRECTION = (POU_ORIGINAL_WIDTH - PLAYER_SIZE) / 2;
+
     private static final String FONT_FAMILY = "Arial";
 
     private static final double MOUNTAIN_1_PEAK_X = 0.3;
@@ -35,15 +42,6 @@ public final class FruitCatcherJavaFXView extends StackPane implements FruitCatc
     private static final double MOUNTAIN_2_PEAK_X = 0.5;
     private static final double MOUNTAIN_2_END_X = 0.8;
     private static final double MOUNTAIN_2_HEIGHT = 80;
-
-    private static final double EYE_OFFSET_X_LEFT = 12;
-    private static final double EYE_OFFSET_X_RIGHT = 33;
-    private static final double EYE_OFFSET_Y = 15;
-    private static final double EYE_SIZE = 15;
-    private static final double PUPIL_OFFSET_X_LEFT = 17;
-    private static final double PUPIL_OFFSET_X_RIGHT = 38;
-    private static final double PUPIL_OFFSET_Y = 20;
-    private static final double PUPIL_SIZE = 5;
 
     private static final double APPLE_STEM_Y_OFFSET = 5;
     private static final double APPLE_STEM_WIDTH = 10;
@@ -66,10 +64,10 @@ public final class FruitCatcherJavaFXView extends StackPane implements FruitCatc
     private static final double GO_TITLE_X_OFFSET = 120;
     private static final double GO_TITLE_Y_OFFSET = 20;
     private static final double GO_SCORE_FONT_SIZE = 25;
-    private static final double GO_SCORE_X_OFFSET = 90;
+    private static final double GO_SCORE_X_OFFSET = 100;
     private static final double GO_SCORE_Y_OFFSET = 30;
     private static final double GO_SUB_FONT_SIZE = 16;
-    private static final double GO_SUB_X_OFFSET = 80;
+    private static final double GO_SUB_X_OFFSET = 70;
     private static final double GO_SUB_Y_OFFSET = 70;
 
     private final Canvas backgroundCanvas;
@@ -78,10 +76,15 @@ public final class FruitCatcherJavaFXView extends StackPane implements FruitCatc
     private final Canvas gameCanvas;
     private final GraphicsContext gameGc;
 
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "JavaFX Node reference is intentional")
+    private final PouCharacterView pouView;
+
     /**
      * Constructor. Initializes the canvases and layout.
+     *
+     * @param pouView the character view to display in the minigame.
      */
-    public FruitCatcherJavaFXView() {
+    public FruitCatcherJavaFXView(final PouCharacterView pouView) {
         this.setPrefSize(GAME_W, GAME_H);
 
         this.backgroundCanvas = new Canvas(0, 0);
@@ -94,7 +97,14 @@ public final class FruitCatcherJavaFXView extends StackPane implements FruitCatc
         gameCanvas.widthProperty().bind(this.widthProperty());
         gameCanvas.heightProperty().bind(this.heightProperty());
 
-        this.getChildren().addAll(backgroundCanvas, gameCanvas);
+        this.pouView = pouView;
+
+        this.pouView.setManaged(false);
+        final double scaleFactor = PLAYER_SIZE / POU_ORIGINAL_WIDTH;
+
+        this.pouView.setFixedScale(scaleFactor);
+
+        this.getChildren().addAll(backgroundCanvas, this.pouView, gameCanvas);
 
         this.setFocusTraversable(true);
     }
@@ -156,7 +166,8 @@ public final class FruitCatcherJavaFXView extends StackPane implements FruitCatc
             gameGc.translate(offsetX, offsetY);
         }
 
-        drawPouPlaceholder(playerX);
+        pouView.setVisible(true);
+        pouView.relocate(offsetX + playerX - VISUAL_OFFSET_CORRECTION, offsetY + (GAME_H - PLAYER_Y_OFFSET));
 
         for (final FallingObject obj : objects) {
             drawFallingObject(obj);
@@ -194,20 +205,6 @@ public final class FruitCatcherJavaFXView extends StackPane implements FruitCatc
         );
 
         bgGc.fillRect(0, horizonY, w, GRASS_HEIGHT);
-    }
-
-    private void drawPouPlaceholder(final double x) {
-        final double y = GAME_H - PLAYER_Y_OFFSET;
-
-        gameGc.setFill(Color.PERU);
-        gameGc.fillOval(x, y, PLAYER_SIZE, PLAYER_SIZE);
-
-        gameGc.setFill(Color.WHITE);
-        gameGc.fillOval(x + EYE_OFFSET_X_LEFT, y + EYE_OFFSET_Y, EYE_SIZE, EYE_SIZE);
-        gameGc.fillOval(x + EYE_OFFSET_X_RIGHT, y + EYE_OFFSET_Y, EYE_SIZE, EYE_SIZE);
-        gameGc.setFill(Color.BLACK);
-        gameGc.fillOval(x + PUPIL_OFFSET_X_LEFT, y + PUPIL_OFFSET_Y, PUPIL_SIZE, PUPIL_SIZE);
-        gameGc.fillOval(x + PUPIL_OFFSET_X_RIGHT, y + PUPIL_OFFSET_Y, PUPIL_SIZE, PUPIL_SIZE);
     }
 
     private void drawFallingObject(final FallingObject obj) {
@@ -270,11 +267,11 @@ public final class FruitCatcherJavaFXView extends StackPane implements FruitCatc
 
         gameGc.setFill(Color.GOLD);
         gameGc.setFont(Font.font(FONT_FAMILY, FontWeight.BOLD, GO_SCORE_FONT_SIZE));
-        gameGc.fillText("Final Score: " + score, w / 2 - GO_SCORE_X_OFFSET, h / 2 + GO_SCORE_Y_OFFSET);
+        gameGc.fillText("You won " + score + " Coins!", w / 2 - GO_SCORE_X_OFFSET, h / 2 + GO_SCORE_Y_OFFSET);
 
         gameGc.setFill(Color.WHITE);
         gameGc.setFont(Font.font(FONT_FAMILY, FontWeight.NORMAL, GO_SUB_FONT_SIZE));
-        gameGc.fillText("Press ESC to exit\"", w / 2 - GO_SUB_X_OFFSET, h / 2 + GO_SUB_Y_OFFSET);
+        gameGc.fillText("Press ESC to exit", w / 2 - GO_SUB_X_OFFSET, h / 2 + GO_SUB_Y_OFFSET);
     }
 
     @Override

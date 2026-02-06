@@ -1,8 +1,8 @@
 package it.unibo.jpou.mvc.controller;
 
-import it.unibo.jpou.mvc.controller.minigames.FruitCatcherController;
-import it.unibo.jpou.mvc.controller.minigames.FruitCatcherControllerImpl;
+import it.unibo.jpou.mvc.model.items.durable.skin.DefaultSkin;
 import it.unibo.jpou.mvc.controller.room.BedroomController;
+import it.unibo.jpou.mvc.controller.room.GameRoomController;
 import it.unibo.jpou.mvc.model.PouLogic;
 import it.unibo.jpou.mvc.model.PouState;
 import it.unibo.jpou.mvc.model.PouStatistics;
@@ -13,8 +13,6 @@ import it.unibo.jpou.mvc.model.items.consumable.food.Food;
 import it.unibo.jpou.mvc.model.items.consumable.potion.Potion;
 import it.unibo.jpou.mvc.model.items.durable.skin.Skin;
 import it.unibo.jpou.mvc.view.MainView;
-import it.unibo.jpou.mvc.view.minigames.FruitCatcherJavaFXView;
-import it.unibo.jpou.mvc.view.minigames.FruitCatcherView;
 import it.unibo.jpou.mvc.view.room.AbstractRoomView;
 import it.unibo.jpou.mvc.view.room.BathroomView;
 import it.unibo.jpou.mvc.view.room.BedroomView;
@@ -40,12 +38,13 @@ public final class MainControllerImpl implements MainController {
 
     private final PouLogic model;
     private final Inventory inventory;
+
     private final Supplier<ShopController> shopControllerSupplier;
     private final Supplier<InventoryController> inventoryControllerSupplier;
+
     private final GameLoop gameLoop;
     private final MainView mainView;
 
-    // Room Views
     private final BedroomView bedroomView;
     private final BathroomView bathroomView;
     private final KitchenView kitchenView;
@@ -53,7 +52,7 @@ public final class MainControllerImpl implements MainController {
     private final ShopView shopView;
     private final GameRoomView gameRoomView;
 
-    private FruitCatcherController activeMinigame;
+    private final GameRoomController gameRoomController;
 
     /**
      * Constructs the logical system and wires dependencies.
@@ -62,9 +61,11 @@ public final class MainControllerImpl implements MainController {
      */
     public MainControllerImpl(final MainView view) {
         this.mainView = Objects.requireNonNull(view, "View cannot be null");
+
         this.model = new PouLogic();
         this.model.setCoins(INITIAL_COINS);
         this.inventory = new InventoryImpl();
+        this.inventory.addItem(new DefaultSkin());
         this.gameLoop = new PouGameLoop();
 
         this.bedroomView = new BedroomView();
@@ -78,10 +79,18 @@ public final class MainControllerImpl implements MainController {
 
         final ShopController shopCtrl = new ShopControllerImpl(this.model, this.inventory);
         final InventoryController invCtrl = new InventoryControllerImpl(this.model, this.inventory);
+
         this.shopControllerSupplier = () -> shopCtrl;
         this.inventoryControllerSupplier = () -> invCtrl;
 
-        setupGameRoomLogic();
+        this.gameRoomController = new GameRoomController(
+                this.model,
+                this.gameRoomView,
+                this.mainView,
+                this.gameLoop,
+                () -> Platform.runLater(this::updateGlobalStatistics)
+        );
+
         setupNavigation();
         setupGameLoop();
         setupConsumableHandlers();
@@ -97,12 +106,7 @@ public final class MainControllerImpl implements MainController {
 
         this.mainView.setRoom(this.bedroomView);
         this.bedroomView.updateView(this.model.getState());
-
         LOGGER.info("[MainController] Logic System initialized.");
-    }
-
-    private void setupGameRoomLogic() {
-        this.gameRoomView.setOnFruitCatcherAction(e -> this.startFruitCatcher());
     }
 
     private void setupNavigation() {
@@ -166,12 +170,15 @@ public final class MainControllerImpl implements MainController {
             this.model.wakeUp();
             this.bedroomView.updateView(PouState.AWAKE);
         }
+
         this.mainView.setCharacterVisible(!(newRoomView instanceof ShopView));
+
         if (newRoomView instanceof ShopView) {
             this.shopControllerSupplier.get().populateShop((ShopView) newRoomView);
         } else {
             updateRoomData(newRoomView);
         }
+
         this.mainView.setRoom(newRoomView);
     }
 
@@ -198,35 +205,18 @@ public final class MainControllerImpl implements MainController {
     @Override
     public void start() {
         this.gameLoop.start();
+        LOGGER.info("[MainController] GameLoop started.");
     }
 
     @Override
     public void stop() {
         this.gameLoop.shutdown();
-        if (this.activeMinigame != null) {
-            this.activeMinigame.shutdown();
+
+        if (this.gameRoomController != null) {
+            this.gameRoomController.shutdown();
         }
-    }
 
-    @Override
-    public void startFruitCatcher() {
-        this.gameLoop.shutdown();
-        final FruitCatcherView minigameView = new FruitCatcherJavaFXView();
-        this.activeMinigame = new FruitCatcherControllerImpl(minigameView, coins -> {
-            this.model.addCoins(coins);
-            closeMinigame(minigameView);
-        });
-        this.mainView.showMinigame(minigameView.getNode());
-        this.activeMinigame.start();
-    }
-
-    private void closeMinigame(final FruitCatcherView minigameView) {
-        Platform.runLater(() -> {
-            this.mainView.removeMinigame(minigameView.getNode());
-            this.activeMinigame = null;
-            this.gameLoop.start();
-            updateGlobalStatistics();
-        });
+        LOGGER.info("[MainController] GameLoop stopped.");
     }
 
     @Override
@@ -237,10 +227,5 @@ public final class MainControllerImpl implements MainController {
     @Override
     public InventoryController getInventoryController() {
         return this.inventoryControllerSupplier.get();
-    }
-
-    @Override
-    public Runnable getFruitCatcherStarter() {
-        return this::startFruitCatcher;
     }
 }

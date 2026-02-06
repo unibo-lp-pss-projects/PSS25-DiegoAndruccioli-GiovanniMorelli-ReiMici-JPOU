@@ -1,5 +1,6 @@
 package it.unibo.jpou.mvc.view.character;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import javafx.beans.property.IntegerProperty;
 import javafx.scene.Group;
 import javafx.scene.shape.Ellipse;
@@ -79,7 +80,25 @@ public final class PouCharacterView extends Group {
     /**
      * @return the eyes component access.
      */
+    @SuppressFBWarnings(
+            value = "EI_EXPOSE_REP",
+            justification = "Eyes component needs to be accessible for animation and binding."
+    )
     public PouEyesComponent getEyes() {
         return this.eyes;
+    }
+
+    /**
+     * Disables the age-based scaling and sets a fixed scale for the character.
+     * Useful for minigames where the size must be constant.
+     *
+     * @param scale the fixed scale value (e.g., 0.5 for half size)
+     */
+    public void setFixedScale(final double scale) {
+        this.scaleXProperty().unbind();
+        this.scaleYProperty().unbind();
+
+        this.setScaleX(scale);
+        this.setScaleY(scale);
     }
 }

@@ -114,7 +114,8 @@ public class PersistenceManager {
         final SavedStatistics statistics = data.statistics();
         return statistics.hunger() >= PouStatistics.STATISTIC_MIN_VALUE
                 && statistics.hunger() <= PouStatistics.STATISTIC_MAX_VALUE
-                && statistics.coins() >= PouCoins.MIN_COINS;
+                && statistics.coins() >= PouCoins.MIN_COINS
+                && statistics.age() >= 0;
     }
 
     private PouSaveData createDefaultData() {
@@ -124,7 +125,8 @@ public class PersistenceManager {
                 PouStatistics.STATISTIC_INITIAL_VALUE,
                 PouStatistics.STATISTIC_INITIAL_VALUE,
                 PouCoins.MIN_COINS,
-                PouState.AWAKE.name()
+                PouState.AWAKE.name(),
+                0
         );
 
         final SavedInventory defaultInventory = new SavedInventory(

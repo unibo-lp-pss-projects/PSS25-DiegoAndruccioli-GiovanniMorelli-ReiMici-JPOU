@@ -13,9 +13,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class FruitCatcherGameTest {
 
-    // CORREZIONE: Allineato alla larghezza reale del gioco (400 invece di 800)
     private static final double GAME_WIDTH = 400.0;
-    private static final double PLAYER_BOUNDARY_OFFSET = 50.0;
+    private static final double PLAYER_SIZE = 60.0;
+
     private static final double INITIAL_TIME = 60.0;
     private static final double TOLERANCE = 0.1;
     private static final double MOVEMENT_DELTA = 50.0;
@@ -36,7 +36,8 @@ class FruitCatcherGameTest {
         assertEquals(0, game.getScore(), "Il punteggio iniziale deve essere 0");
         assertFalse(game.isGameOver(), "Il gioco non deve iniziare in Game Over");
 
-        assertEquals(GAME_WIDTH / 2, game.getPlayerX(), "Pou deve iniziare al centro dello schermo");
+        final double expectedInitialX = (GAME_WIDTH - PLAYER_SIZE) / 2.0;
+        assertEquals(expectedInitialX, game.getPlayerX(), "Pou deve iniziare centrato (considerando la sua larghezza)");
 
         assertEquals(INITIAL_TIME, game.getTimeLeft(), TOLERANCE, "Il timer deve partire da 60 secondi");
     }
@@ -65,7 +66,7 @@ class FruitCatcherGameTest {
     void testBoundaryRight() {
         game.setPlayerPosition(OUT_OF_BOUNDS_POSITION);
 
-        final double expectedMaxX = GAME_WIDTH - PLAYER_BOUNDARY_OFFSET;
+        final double expectedMaxX = GAME_WIDTH - PLAYER_SIZE;
 
         assertEquals(expectedMaxX, game.getPlayerX(), "Pou non deve superare il bordo destro");
     }
