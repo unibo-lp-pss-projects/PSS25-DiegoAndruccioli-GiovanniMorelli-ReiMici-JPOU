@@ -74,7 +74,7 @@ public final class KitchenView extends AbstractRoomView {
      * @param food the map of food items and their counts.
      */
     public void refreshFood(final Map<Food, Integer> food) {
-        this.currentFoodMap = food;
+        this.currentFoodMap = Map.copyOf(food);
         this.availableFood = new ArrayList<>(food.keySet());
 
         if (this.availableFood.isEmpty()) {

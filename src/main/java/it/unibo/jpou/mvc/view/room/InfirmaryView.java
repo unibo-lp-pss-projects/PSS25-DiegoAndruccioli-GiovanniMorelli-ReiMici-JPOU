@@ -74,7 +74,7 @@ public final class InfirmaryView extends AbstractRoomView {
      * @param potions the map of potions and their counts.
      */
     public void refreshPotions(final Map<Potion, Integer> potions) {
-        this.currentPotionMap = potions;
+        this.currentPotionMap = Map.copyOf(potions);
         this.availablePotions = new ArrayList<>(potions.keySet());
 
         if (this.availablePotions.isEmpty()) {
