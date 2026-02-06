@@ -1,49 +1,48 @@
 package it.unibo.jpou.mvc.model.shop;
 
-import java.util.Collections;
-import java.util.List;
 import it.unibo.jpou.mvc.model.inventory.Inventory;
 import it.unibo.jpou.mvc.model.items.Item;
 import it.unibo.jpou.mvc.model.items.durable.Durable;
 
-/**
- * Concrete implementation of the Shop interface.
- */
-public class ShopImpl implements Shop {
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
-    private final List<Item> catalog;
+/**
+ * Implementation of the Shop business logic.
+ * Manages item transactions and validation.
+ */
+public final class ShopImpl implements Shop {
+
+    private final List<Item> items;
 
     /**
-     * Constructs a shop with a predefined list of items.
+     * Creates a new Shop with the specified list of items.
      *
-     * @param items the items to be sold in the shop.
+     * @param items The list of items available for purchase.
      */
     public ShopImpl(final List<Item> items) {
-        this.catalog = List.copyOf(items);
+        this.items = new ArrayList<>(Objects.requireNonNull(items));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public final int buyItem(final Inventory inventory, final int currentBalance, final Item item) {
-        if (item instanceof Durable && inventory.isOwned((Durable) item)) {
-            throw new IllegalStateException("Item already owned: " + item.getName());
+    public List<Item> getAvailableItems() {
+        return Collections.unmodifiableList(this.items);
+    }
+
+    @Override
+    public int buyItem(final Inventory inventory, final int currentCoins, final Item item) {
+        if (currentCoins < item.getPrice()) {
+            throw new IllegalArgumentException("Insufficient funds! Needed: " + item.getPrice());
         }
 
-        if (currentBalance < item.getPrice()) {
-            throw new IllegalArgumentException("Not enough credits to buy: " + item.getName());
+        if (item instanceof Durable && inventory.isOwned((Durable) item)) {
+            throw new IllegalStateException("Item already owned!");
         }
 
         inventory.addItem(item);
-        return currentBalance - item.getPrice();
-    }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final List<Item> getAvailableItems() {
-        return Collections.unmodifiableList(this.catalog);
+        return currentCoins - item.getPrice();
     }
 }
