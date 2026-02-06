@@ -38,7 +38,7 @@ public final class FruitCatcherControllerImpl implements FruitCatcherController 
 
         this.view.setKeyListener(event -> {
             if (event.getCode() == KeyCode.ESCAPE) {
-                if (model.isGameOver() && !coinsAwarded) {
+                if (!coinsAwarded) {
                     awardCoins();
                 }
                 shutdown();
