@@ -1,31 +1,33 @@
 package it.unibo.jpou.mvc.model.roomlogic;
 
 import it.unibo.jpou.mvc.model.PouStatistics;
-import it.unibo.jpou.mvc.model.items.consumable.potion.EnergyPotion;
-import it.unibo.jpou.mvc.model.items.consumable.potion.HealthPotion;
 import it.unibo.jpou.mvc.model.items.consumable.potion.Potion;
+import it.unibo.jpou.mvc.model.items.consumable.potion.HealthPotion;
+import it.unibo.jpou.mvc.model.items.consumable.potion.EnergyPotion;
 
 /**
- * Logic for Infirmary, action use potion.
+ * Logic for the Infirmary.
  */
 public final class InfirmaryLogic {
 
     /**
-     * Uses a specific potion.
+     * Applies potion effects selectively based on potion type.
      *
-     * @param energy the energy statistic to modify.
-     * @param health the health statistic to modify.
-     * @param potion the potion item to use.
+     * @param energyStat the energy statistic.
+     * @param healthStat the health statistic.
+     * @param potion     the potion to use.
      */
-    public void usePotion(final PouStatistics energy, final PouStatistics health, final Potion potion) {
-        if (potion == null) {
+    public void usePotion(final PouStatistics energyStat, final PouStatistics healthStat, final Potion potion) {
+        if (potion == null || energyStat == null || healthStat == null) {
             return;
         }
 
+        final int effect = potion.getEffectValue();
+
         if (potion instanceof HealthPotion) {
-            health.setValueStat(health.getValueStat() + potion.getEffectValue());
+            healthStat.setValueStat(healthStat.getValueStat() + effect);
         } else if (potion instanceof EnergyPotion) {
-            energy.setValueStat(energy.getValueStat() + potion.getEffectValue());
+            energyStat.setValueStat(energyStat.getValueStat() + effect);
         }
     }
 }
