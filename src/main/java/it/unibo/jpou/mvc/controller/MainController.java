@@ -16,4 +16,18 @@ public interface MainController {
      * Stops the application and releases resources.
      */
     void stop();
+
+    /**
+     * Returns the controller responsible for the Shop logic.
+     *
+     * @return the shop controller instance.
+     */
+    ShopController getShopController();
+
+    /**
+     * Returns the controller responsible for Inventory logic.
+     *
+     * @return the inventory controller instance.
+     */
+    InventoryController getInventoryController();
 }
