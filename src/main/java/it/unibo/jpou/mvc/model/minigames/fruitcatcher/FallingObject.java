@@ -47,8 +47,6 @@ public class FallingObject {
     private final double xPos;
     private double yPos;
     private final Type type;
-    private final int width;
-    private final int height;
 
     /**
      * Constructs a new falling object.
@@ -63,8 +61,6 @@ public class FallingObject {
         this.xPos = startX;
         this.yPos = startY;
         this.type = type;
-        this.width = width;
-        this.height = height;
     }
 
     /**
@@ -97,20 +93,6 @@ public class FallingObject {
      */
     public Type getType() {
         return this.type;
-    }
-
-    /**
-     * @return the width of the object.
-     */
-    public int getWidth() {
-        return this.width;
-    }
-
-    /**
-     * @return the height of the object.
-     */
-    public int getHeight() {
-        return this.height;
     }
 
     /**

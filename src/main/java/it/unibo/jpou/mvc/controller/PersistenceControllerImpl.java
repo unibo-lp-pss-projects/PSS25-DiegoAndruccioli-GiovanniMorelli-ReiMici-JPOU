@@ -100,7 +100,7 @@ public class PersistenceControllerImpl implements PersistenceController {
                 this.model.getHealth(),
                 this.model.getCoins(),
                 this.model.getState().name(),
-                0
+                this.model.getAge()
         );
 
         /* saving consumable data */
@@ -137,6 +137,7 @@ public class PersistenceControllerImpl implements PersistenceController {
         this.model.setFun(data.statistics().fun());
         this.model.setHealth(data.statistics().health());
         this.model.setCoins(data.statistics().coins());
+        this.model.setAge(data.statistics().age());
 
         /* State recovery */
         try {
