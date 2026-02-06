@@ -1,118 +1,92 @@
 package it.unibo.jpou.mvc.view.room;
 
 import it.unibo.jpou.mvc.model.items.Item;
-import javafx.scene.control.Button;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.VBox;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Locale;
 import java.util.function.Consumer;
 
 /**
- * View for the Shop.
+ * Ultra-simple Grid View with rounded cards.
  */
 public final class ShopView extends AbstractRoomView {
 
-    private final Label feedbackLabel;
-    private final Button browseButton;
-    private final Button buyButton;
+    private static final int MAIN_PADDING = 20;
+    private static final int HGAP = 15;
+    private static final int VGAP = 15;
 
-    private List<Item> availableItems;
-    private Map<Item, Integer> priceMap;
-    private int currentIndex = -1;
-    private Item currentSelectedItem;
-    private Consumer<Item> onBuyAction;
+    private final FlowPane cardsContainer;
+    private final Label feedbackLabel;
 
     /**
-     * Initializes the Shop View layout.
+     * Constructor.
      */
     public ShopView() {
-        super("Shop");
+        super("Market");
 
-        this.getStylesheets().add(
-                Objects.requireNonNull(getClass().getResource("/style/room/styleShopView.css"))
-                        .toExternalForm());
-        this.getStylesheets().add(
-                Objects.requireNonNull(getClass().getResource("/style/room/defaultRoom.css"))
-                        .toExternalForm());
-        this.getStyleClass().add("shop-view");
+        this.getStylesheets().add(Objects.requireNonNull(
+                getClass().getResource("/style/room/styleShopView.css")).toExternalForm());
+        this.getStylesheets().add(Objects.requireNonNull(
+                getClass().getResource("/style/room/defaultRoom.css")).toExternalForm());
+        this.getStyleClass().add("shop-view-minimal");
 
-        final StackPane centerLayout = new StackPane();
+        this.feedbackLabel = new Label("CHOOSE AN ITEM");
+        this.feedbackLabel.getStyleClass().add("simple-feedback");
 
-        this.feedbackLabel = new Label("Welcome to Shop");
-        this.feedbackLabel.getStyleClass().add("feedback-label");
+        this.cardsContainer = new FlowPane();
+        this.cardsContainer.setPadding(new Insets(MAIN_PADDING));
+        this.cardsContainer.setHgap(HGAP);
+        this.cardsContainer.setVgap(VGAP);
+        this.cardsContainer.setAlignment(Pos.CENTER);
 
-        centerLayout.getChildren().add(feedbackLabel);
-        this.getChildren().add(centerLayout);
+        final VBox mainLayout = new VBox(MAIN_PADDING);
+        mainLayout.setAlignment(Pos.CENTER);
+        mainLayout.getChildren().addAll(feedbackLabel, cardsContainer);
 
-        this.browseButton = new Button("Browse");
-        this.browseButton.getStyleClass().add("action-button");
-
-        this.buyButton = new Button("Buy");
-        this.buyButton.getStyleClass().add("action-button");
-
-        this.browseButton.setOnAction(_ -> scrollNextItem());
-        this.buyButton.setOnAction(_ -> triggerBuy());
-
-        this.getActionBar().getChildren().addAll(this.browseButton, this.buyButton);
-
-        this.availableItems = new ArrayList<>();
-        this.priceMap = new HashMap<>();
+        this.setCenter(mainLayout);
+        this.getActionBar().getChildren().clear();
     }
 
     /**
-     * Receives the catalog data from the Controller.
+     * Populates shop.
      *
-     * @param catalog The map of Items and Prices.
-     * @param onBuy The action to execute when buying.
+     * @param catalog items.
+     * @param onBuy buy action.
      */
     public void populateShop(final Map<Item, Integer> catalog, final Consumer<Item> onBuy) {
-        this.priceMap = new HashMap<>(catalog);
-        this.availableItems = new ArrayList<>(catalog.keySet());
-        this.onBuyAction = onBuy;
-
-        this.currentIndex = -1;
-        this.currentSelectedItem = null;
-        this.feedbackLabel.setText("Click 'Browse' to see items");
+        this.cardsContainer.getChildren().clear();
+        catalog.forEach((item, price) -> {
+            this.cardsContainer.getChildren().add(createRoundedCard(item, price, onBuy));
+        });
     }
 
-    private void scrollNextItem() {
-        if (this.availableItems.isEmpty()) {
-            this.feedbackLabel.setText("Shop Empty");
-            return;
-        }
+    private VBox createRoundedCard(final Item item, final int price, final Consumer<Item> onBuy) {
+        final VBox card = new VBox(5);
+        card.getStyleClass().add("rounded-card");
+        card.setAlignment(Pos.CENTER);
 
-        this.currentIndex = (this.currentIndex + 1) % this.availableItems.size();
+        final Label nameLabel = new Label(item.getClass().getSimpleName().toLowerCase(Locale.ROOT));
+        nameLabel.getStyleClass().add("card-name");
 
-        this.currentSelectedItem = this.availableItems.get(this.currentIndex);
-        final int price = this.priceMap.get(this.currentSelectedItem);
+        final Label priceLabel = new Label(price + "$");
+        priceLabel.getStyleClass().add("card-price");
 
-        final String name = this.currentSelectedItem.getClass().getSimpleName().toUpperCase(Locale.ROOT);
-        this.feedbackLabel.setText(name + " (" + price + "$)");
-    }
+        card.getChildren().addAll(nameLabel, priceLabel);
+        card.setOnMouseClicked(e -> onBuy.accept(item));
 
-    private void triggerBuy() {
-        if (this.currentSelectedItem == null) {
-            this.feedbackLabel.setText("Select an item first!");
-            return;
-        }
-
-        if (this.onBuyAction != null) {
-            this.onBuyAction.accept(this.currentSelectedItem);
-        }
+        return card;
     }
 
     /**
-     * Updates the central label.
-     *
-     * @param message text to show.
+     * @param message feedback message.
      */
     public void setFeedbackText(final String message) {
-        this.feedbackLabel.setText(message);
+        this.feedbackLabel.setText(message.toUpperCase(Locale.ROOT));
     }
 }
