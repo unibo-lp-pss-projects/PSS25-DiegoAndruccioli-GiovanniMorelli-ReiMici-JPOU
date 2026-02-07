@@ -271,4 +271,13 @@ public final class MainView {
     public void setOnQuitAction(final EventHandler<ActionEvent> handler) {
         this.pauseOverlay.setOnQuit(handler);
     }
+
+    /**
+     * Updates the displayed coin balance.
+     *
+     * @param coins the current coin balance.
+     */
+    public void updateCoins(final int coins) {
+        this.topBar.updateCoins("Coins: " + coins);
+    }
 }

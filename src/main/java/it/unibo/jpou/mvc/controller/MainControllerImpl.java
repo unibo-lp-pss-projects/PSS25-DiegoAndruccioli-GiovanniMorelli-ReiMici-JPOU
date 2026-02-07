@@ -217,6 +217,7 @@ public final class MainControllerImpl implements MainController {
         this.mainView.updateStat("health",
                 (double) this.model.getHealth() / PouStatistics.STATISTIC_MAX_VALUE,
                 String.valueOf(this.model.getHealth()));
+        this.mainView.updateCoins(this.model.getCoins());
     }
 
     private void changeRoom(final AbstractRoomView newRoomView) {
