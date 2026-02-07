@@ -165,11 +165,16 @@ public final class MainControllerImpl implements MainController {
             }
         }
 
+        this.model.coinsProperty().addListener((obs, oldVal, newVal) -> {
+            Platform.runLater(this::updateGlobalStatistics);
+        });
+
         changeRoom(startView);
         if (startView instanceof BedroomView) {
             this.bedroomView.updateView(this.model.getState());
 
         }
+        updateGlobalStatistics();
         LOGGER.info("Sistema logico inizializzato correttamente");
     }
 

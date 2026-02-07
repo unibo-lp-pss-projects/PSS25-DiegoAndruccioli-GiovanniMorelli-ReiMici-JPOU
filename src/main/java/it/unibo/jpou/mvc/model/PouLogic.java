@@ -18,6 +18,7 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.ReadOnlyIntegerProperty;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -331,4 +332,12 @@ public final class PouLogic {
 
         this.age.set(0);
     }
+
+    /**
+     * @return coins property (read-only).
+     */
+    public ReadOnlyIntegerProperty coinsProperty() {
+        return this.coins.coinsProperty();
+    }
+
 }
