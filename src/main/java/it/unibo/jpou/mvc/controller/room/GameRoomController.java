@@ -11,6 +11,7 @@ import it.unibo.jpou.mvc.view.minigames.FruitCatcherJavaFXView;
 import it.unibo.jpou.mvc.view.minigames.FruitCatcherView;
 import it.unibo.jpou.mvc.view.room.GameRoomView;
 import javafx.application.Platform;
+import javafx.scene.control.Alert;
 
 import java.util.logging.Logger;
 
@@ -54,6 +55,14 @@ public final class GameRoomController {
     }
 
     private void startFruitCatcher() {
+        if (this.model.getEnergy() < 10) {
+            final Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Energia Insufficiente");
+            alert.setHeaderText(null);
+            alert.setContentText("Pou è troppo stanco per giocare! Ha bisogno di riposare o di una pozione.");
+            alert.showAndWait();
+            return;
+        }
         LOGGER.info("[GameRoomController] Starting Fruit Catcher...");
 
         this.mainGameLoop.shutdown();
