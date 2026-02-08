@@ -4,6 +4,7 @@ import it.unibo.jpou.mvc.model.statistics.EnergyStatistic;
 import it.unibo.jpou.mvc.model.statistics.FunStatistic;
 import it.unibo.jpou.mvc.model.statistics.HealthStatistic;
 import it.unibo.jpou.mvc.model.statistics.HungerStatistic;
+import it.unibo.jpou.mvc.model.statistics.PouStatistics;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertAll;

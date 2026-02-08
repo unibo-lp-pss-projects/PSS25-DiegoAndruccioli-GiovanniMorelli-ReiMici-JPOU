@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import it.unibo.jpou.mvc.model.PouCoins;
 import it.unibo.jpou.mvc.model.PouState;
-import it.unibo.jpou.mvc.model.PouStatistics;
+import it.unibo.jpou.mvc.model.statistics.PouStatistics;
 import it.unibo.jpou.mvc.model.Room;
 import it.unibo.jpou.mvc.model.items.durable.skin.DefaultSkin;
 import it.unibo.jpou.mvc.model.save.PouSaveData;

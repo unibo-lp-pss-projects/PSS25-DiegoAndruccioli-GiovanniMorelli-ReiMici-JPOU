@@ -1,7 +1,7 @@
 package it.unibo.jpou.mvc.controller.overlay;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import it.unibo.jpou.mvc.controller.GameLoop;
+import it.unibo.jpou.mvc.controller.gameloop.GameLoop;
 import it.unibo.jpou.mvc.model.PouLogic;
 import it.unibo.jpou.mvc.view.MainView;
 import javafx.application.Platform;

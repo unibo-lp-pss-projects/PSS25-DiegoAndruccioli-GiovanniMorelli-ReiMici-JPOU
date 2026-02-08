@@ -1,4 +1,4 @@
-package it.unibo.jpou.mvc.controller;
+package it.unibo.jpou.mvc.controller.gameloop;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
