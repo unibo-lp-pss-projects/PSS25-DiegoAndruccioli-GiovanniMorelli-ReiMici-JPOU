@@ -23,10 +23,13 @@ public final class GameOverOverlayView extends VBox {
         this.setAlignment(Pos.CENTER);
         this.getStyleClass().add("game-over-overlay");
 
+        this.getStylesheets().add(getClass().getResource("/style/overlay/styleGameOverOverlayView.css")
+                .toExternalForm());
+
         final Label deathLabel = new Label("POU IS GONE...");
         deathLabel.getStyleClass().add("game-over-title");
 
-        final Label subLabel = new Label("Take better care of him next time!");
+        final Label subLabel = new Label("Press the button to close the game and prepare a new game");
         subLabel.getStyleClass().add("game-over-subtitle");
 
         this.restartButton = new Button("Try Again");
@@ -44,4 +47,3 @@ public final class GameOverOverlayView extends VBox {
         this.restartButton.setOnAction(handler);
     }
 }
-

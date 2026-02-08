@@ -25,14 +25,19 @@ public final class PauseOverlayView extends VBox {
         this.setAlignment(Pos.CENTER);
         this.getStyleClass().add("pause-overlay");
 
+        this.getStylesheets().add(getClass().getResource("/style/overlay/stylePauseOverlay.css")
+                .toExternalForm());
+
         final Label pauseLabel = new Label("GAME PAUSED");
         pauseLabel.getStyleClass().add("overlay-title");
 
         this.resumeButton = new Button("Resume");
         this.resumeButton.getStyleClass().add("overlay-button");
+        this.resumeButton.getStyleClass().add("resume-button");
 
-        this.quitButton = new Button("Quit to Menu");
+        this.quitButton = new Button("Save and Exit");
         this.quitButton.getStyleClass().add("overlay-button");
+        this.quitButton.getStyleClass().add("quit-button");
 
         this.getChildren().addAll(pauseLabel, this.resumeButton, this.quitButton);
     }
