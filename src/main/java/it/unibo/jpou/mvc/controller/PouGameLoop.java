@@ -15,7 +15,9 @@ public final class PouGameLoop implements GameLoop {
     private static final long TICK_INTERVAL_SECONDS = 30;
     private static final long TIME_OUT = 5;
 
-    private final long tickInterval;
+    private final long tickIntervalMillis;
+    private long remainingTimeMillis;
+    private long lastStartTimeMillis;
 
     private final List<Runnable> tickListeners = new CopyOnWriteArrayList<>();
 
@@ -38,7 +40,8 @@ public final class PouGameLoop implements GameLoop {
     public PouGameLoop(final long intervalSeconds) {
         this.scheduler = Executors.newSingleThreadScheduledExecutor();
         this.running = false;
-        this.tickInterval = intervalSeconds;
+        this.tickIntervalMillis = TimeUnit.SECONDS.toMillis(intervalSeconds);
+        this.remainingTimeMillis = this.tickIntervalMillis;
     }
 
     /**
@@ -52,12 +55,23 @@ public final class PouGameLoop implements GameLoop {
             }
 
             this.running = true;
-            this.currentTask = this.scheduler.scheduleAtFixedRate(
-                    this::tick,
-                    0,
-                    this.tickInterval,
-                    TimeUnit.SECONDS);
+            this.lastStartTimeMillis = System.currentTimeMillis();
+
+            scheduleTick(this.remainingTimeMillis);
         }
+    }
+
+    void scheduleTick(final long delayMillis) {
+        this.currentTask = this.scheduler.schedule(
+                () -> {
+                    tick();
+                    this.remainingTimeMillis = this.tickIntervalMillis;
+                    this.lastStartTimeMillis = System.currentTimeMillis();
+                    scheduleTick(this.tickIntervalMillis);
+                },
+                delayMillis,
+                TimeUnit.MILLISECONDS
+        );
     }
 
     /**
@@ -92,6 +106,12 @@ public final class PouGameLoop implements GameLoop {
     public void pause() {
         if (this.running) {
             this.running = false;
+
+            final long now = System.currentTimeMillis();
+            final long spent = now - this.lastStartTimeMillis;
+
+            this.remainingTimeMillis = Math.max(0, this.remainingTimeMillis - spent);
+
             if (this.currentTask != null) {
                 this.currentTask.cancel(false);
             }
