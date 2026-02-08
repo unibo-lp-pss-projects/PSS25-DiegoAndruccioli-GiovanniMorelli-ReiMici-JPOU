@@ -17,36 +17,18 @@ java {
 }
 
 val javaFxVersion = "23.0.2"
-val javaFXModules = listOf("base", "controls", "fxml", "swing", "graphics")
-// Platforms to support: standard ones + mac-aarch64 (M1/M2/M3)
-val supportedPlatforms = listOf("linux", "mac", "win", "mac-aarch64")
 
-val crossPlatformLibs by configurations.creating
+val javaFXModules = listOf("base", "controls", "fxml", "swing", "graphics")
+
+val supportedPlatforms = listOf("linux", "mac", "win")
 
 dependencies {
     compileOnly("com.github.spotbugs:spotbugs-annotations:4.9.8")
 
-    // Rilevamento automatico del sistema corrente per il RUN locale
-    val osName = System.getProperty("os.name").lowercase()
-    val osArch = System.getProperty("os.arch").lowercase()
-    val currentPlatform = when {
-        osName.contains("win") -> "win"
-        osName.contains("nux") || osName.contains("nix") || osName.contains("aix") -> "linux"
-        osName.contains("mac") && (osArch == "aarch64" || osArch.contains("arm")) -> "mac-aarch64"
-        osName.contains("mac") -> "mac"
-        else -> "linux" // Fallback
-    }
-
-    for (module in javaFXModules) {
-        implementation("org.openjfx:javafx-$module:$javaFxVersion:$currentPlatform")
-    }
-
-    val allPlatforms = listOf("linux", "mac", "win", "mac-aarch64")
-    for (platform in allPlatforms) {
-        if (platform != currentPlatform) {
-            for (module in javaFXModules) {
-                crossPlatformLibs("org.openjfx:javafx-$module:$javaFxVersion:$platform")
-            }
+    implementation("org.openjfx:javafx:$javaFxVersion")
+    for (platform in supportedPlatforms) {
+        for (module in javaFXModules) {
+            implementation("org.openjfx:javafx-$module:$javaFxVersion:$platform")
         }
     }
 
@@ -56,9 +38,6 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
 }
 
-tasks.shadowJar {
-    configurations = listOf(project.configurations.runtimeClasspath.get(), crossPlatformLibs)
-}
 tasks.withType<Test> {
     useJUnitPlatform()
     finalizedBy(tasks.jacocoTestReport)
