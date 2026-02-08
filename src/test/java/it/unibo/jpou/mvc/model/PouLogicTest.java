@@ -2,6 +2,7 @@ package it.unibo.jpou.mvc.model;
 
 import it.unibo.jpou.mvc.model.items.consumable.food.Apple;
 import it.unibo.jpou.mvc.model.items.consumable.potion.HealthPotion;
+import it.unibo.jpou.mvc.model.statistics.PouStatistics;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

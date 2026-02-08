@@ -1,9 +1,11 @@
 package it.unibo.jpou.mvc.controller;
 
+import it.unibo.jpou.mvc.controller.persistence.PersistenceController;
+import it.unibo.jpou.mvc.controller.persistence.PersistenceControllerImpl;
 import it.unibo.jpou.mvc.model.PouCoins;
 import it.unibo.jpou.mvc.model.PouLogic;
 import it.unibo.jpou.mvc.model.PouState;
-import it.unibo.jpou.mvc.model.PouStatistics;
+import it.unibo.jpou.mvc.model.statistics.PouStatistics;
 import it.unibo.jpou.mvc.model.Room;
 import it.unibo.jpou.mvc.model.inventory.Inventory;
 import it.unibo.jpou.mvc.model.inventory.InventoryImpl;

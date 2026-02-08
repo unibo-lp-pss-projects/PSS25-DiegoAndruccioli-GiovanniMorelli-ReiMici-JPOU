@@ -1,5 +1,9 @@
 package it.unibo.jpou.mvc.controller;
 
+import it.unibo.jpou.mvc.controller.inventory.InventoryController;
+import it.unibo.jpou.mvc.controller.inventory.InventoryControllerImpl;
+import it.unibo.jpou.mvc.controller.shop.ShopController;
+import it.unibo.jpou.mvc.controller.shop.ShopControllerImpl;
 import it.unibo.jpou.mvc.model.PouLogic;
 import it.unibo.jpou.mvc.model.inventory.Inventory;
 import it.unibo.jpou.mvc.model.inventory.InventoryImpl;

@@ -1,4 +1,4 @@
-package it.unibo.jpou.mvc.controller;
+package it.unibo.jpou.mvc.controller.persistence;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import it.unibo.jpou.mvc.model.PouLogic;

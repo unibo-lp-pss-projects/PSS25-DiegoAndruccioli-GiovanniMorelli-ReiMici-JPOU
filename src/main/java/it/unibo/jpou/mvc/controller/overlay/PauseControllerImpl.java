@@ -1,9 +1,9 @@
 package it.unibo.jpou.mvc.controller.overlay;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import it.unibo.jpou.mvc.controller.GameLoop;
-import it.unibo.jpou.mvc.controller.PersistenceController;
-import it.unibo.jpou.mvc.controller.PouGameLoop;
+import it.unibo.jpou.mvc.controller.gameloop.GameLoop;
+import it.unibo.jpou.mvc.controller.persistence.PersistenceController;
+import it.unibo.jpou.mvc.controller.gameloop.PouGameLoop;
 import it.unibo.jpou.mvc.model.Room;
 import it.unibo.jpou.mvc.view.MainView;
 import javafx.application.Platform;

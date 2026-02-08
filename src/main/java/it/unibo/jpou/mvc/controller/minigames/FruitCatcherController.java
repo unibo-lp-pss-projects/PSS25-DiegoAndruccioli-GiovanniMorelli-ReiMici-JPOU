@@ -1,6 +1,6 @@
 package it.unibo.jpou.mvc.controller.minigames;
 
-import it.unibo.jpou.mvc.controller.GameLoop;
+import it.unibo.jpou.mvc.controller.gameloop.GameLoop;
 
 /**
  * Interface for the Fruit Catcher minigame controller.

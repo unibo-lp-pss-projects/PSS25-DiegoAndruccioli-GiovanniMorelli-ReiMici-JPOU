@@ -1,4 +1,4 @@
-package it.unibo.jpou.mvc.controller;
+package it.unibo.jpou.mvc.controller.inventory;
 
 import it.unibo.jpou.mvc.model.items.Item;
 

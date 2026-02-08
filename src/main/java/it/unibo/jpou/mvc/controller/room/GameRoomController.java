@@ -1,7 +1,7 @@
 package it.unibo.jpou.mvc.controller.room;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import it.unibo.jpou.mvc.controller.GameLoop;
+import it.unibo.jpou.mvc.controller.gameloop.GameLoop;
 import it.unibo.jpou.mvc.controller.minigames.FruitCatcherController;
 import it.unibo.jpou.mvc.controller.minigames.FruitCatcherControllerImpl;
 import it.unibo.jpou.mvc.model.PouLogic;

@@ -1,6 +1,6 @@
 package it.unibo.jpou.mvc.model.roomlogic;
 
-import it.unibo.jpou.mvc.model.PouStatistics;
+import it.unibo.jpou.mvc.model.statistics.PouStatistics;
 
 /**
  * Logic for Game Room, action play.

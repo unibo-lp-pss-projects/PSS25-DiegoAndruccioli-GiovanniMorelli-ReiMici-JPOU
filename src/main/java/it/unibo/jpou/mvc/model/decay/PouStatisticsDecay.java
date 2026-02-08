@@ -1,7 +1,7 @@
 package it.unibo.jpou.mvc.model.decay;
 
 import it.unibo.jpou.mvc.model.PouState;
-import it.unibo.jpou.mvc.model.PouStatistics;
+import it.unibo.jpou.mvc.model.statistics.PouStatistics;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.IntegerProperty;
 

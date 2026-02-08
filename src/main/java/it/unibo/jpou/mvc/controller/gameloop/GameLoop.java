@@ -1,4 +1,4 @@
-package it.unibo.jpou.mvc.controller;
+package it.unibo.jpou.mvc.controller.gameloop;
 
 /**
  * Interface for Game loop engine managing the time cycle.

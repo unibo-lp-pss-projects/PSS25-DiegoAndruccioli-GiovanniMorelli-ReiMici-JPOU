@@ -1,17 +1,25 @@
 package it.unibo.jpou.mvc.controller;
 
+import it.unibo.jpou.mvc.controller.gameloop.GameLoop;
+import it.unibo.jpou.mvc.controller.gameloop.PouGameLoop;
+import it.unibo.jpou.mvc.controller.inventory.InventoryController;
+import it.unibo.jpou.mvc.controller.inventory.InventoryControllerImpl;
 import it.unibo.jpou.mvc.controller.overlay.GameOverController;
 import it.unibo.jpou.mvc.controller.overlay.GameOverControllerImpl;
 import it.unibo.jpou.mvc.controller.overlay.PauseController;
 import it.unibo.jpou.mvc.controller.overlay.PauseControllerImpl;
+import it.unibo.jpou.mvc.controller.persistence.PersistenceController;
+import it.unibo.jpou.mvc.controller.persistence.PersistenceControllerImpl;
 import it.unibo.jpou.mvc.controller.room.BathroomController;
 import it.unibo.jpou.mvc.controller.room.BedroomController;
 import it.unibo.jpou.mvc.controller.room.GameRoomController;
 import it.unibo.jpou.mvc.controller.room.InfirmaryController;
 import it.unibo.jpou.mvc.controller.room.KitchenController;
+import it.unibo.jpou.mvc.controller.shop.ShopController;
+import it.unibo.jpou.mvc.controller.shop.ShopControllerImpl;
 import it.unibo.jpou.mvc.model.PouLogic;
 import it.unibo.jpou.mvc.model.PouState;
-import it.unibo.jpou.mvc.model.PouStatistics;
+import it.unibo.jpou.mvc.model.statistics.PouStatistics;
 import it.unibo.jpou.mvc.model.Room;
 import it.unibo.jpou.mvc.model.inventory.Inventory;
 import it.unibo.jpou.mvc.model.inventory.InventoryImpl;
