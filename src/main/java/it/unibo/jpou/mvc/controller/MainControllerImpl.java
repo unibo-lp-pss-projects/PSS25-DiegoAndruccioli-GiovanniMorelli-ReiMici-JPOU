@@ -90,10 +90,8 @@ public final class MainControllerImpl implements MainController {
                 this.persistenceController,
                 () -> this.currentRoom);
         this.gameOverController = new GameOverControllerImpl(
-                this.gameLoop,
-                this.mainView,
-                this.model
-        );
+                this.model,
+                this.persistenceController);
         this.bedroomView = new BedroomView();
         this.bathroomView = new BathroomView();
         this.kitchenView = new KitchenView();
@@ -244,7 +242,8 @@ public final class MainControllerImpl implements MainController {
     }
 
     /**
-     * It is used when reloading data to understand which room Pou was at the time of closing the previous session.
+     * It is used when reloading data to understand which room Pou was at the time
+     * of closing the previous session.
      *
      * @param room the enum taken from the save file
      * @return the room that corresponds to the enum
@@ -261,7 +260,8 @@ public final class MainControllerImpl implements MainController {
     }
 
     /**
-     * It is used when navigating within the game to understand which room Pou is in.
+     * It is used when navigating within the game to understand which room Pou is
+     * in.
      *
      * @param view the room where it is located
      * @return the enum of corresponding room

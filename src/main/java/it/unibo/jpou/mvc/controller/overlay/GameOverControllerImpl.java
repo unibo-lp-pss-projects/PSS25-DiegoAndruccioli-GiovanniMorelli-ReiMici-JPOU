@@ -1,9 +1,8 @@
 package it.unibo.jpou.mvc.controller.overlay;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import it.unibo.jpou.mvc.controller.GameLoop;
+import it.unibo.jpou.mvc.controller.PersistenceController;
 import it.unibo.jpou.mvc.model.PouLogic;
-import it.unibo.jpou.mvc.view.MainView;
 import javafx.application.Platform;
 
 import java.util.Objects;
@@ -13,28 +12,25 @@ import java.util.Objects;
  */
 public final class GameOverControllerImpl implements GameOverController {
 
-    private final GameLoop gameLoop;
-    private final MainView mainView;
     private final PouLogic model;
+    private final PersistenceController persistenceController;
 
     /**
-     * @param gameLoop the game loop to restart
-     * @param mainView the view to update
-     * @param model    the model to reset
+     * @param model the model to reset
+     * @param persistenceController the controller for data persistence
      */
-    @SuppressFBWarnings(value = "EI_EXPOSE_REP2",
-            justification = "Dependency injection requires mutable references.")
-    public GameOverControllerImpl(final GameLoop gameLoop, final MainView mainView, final PouLogic model) {
-        this.gameLoop = Objects.requireNonNull(gameLoop);
-        this.mainView = Objects.requireNonNull(mainView);
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Dependency injection requires mutable references.")
+    public GameOverControllerImpl(final PouLogic model,
+            final PersistenceController persistenceController) {
         this.model = Objects.requireNonNull(model);
+        this.persistenceController = Objects.requireNonNull(persistenceController);
     }
 
     @Override
     public void restart() {
         this.model.reset();
-        this.mainView.setGameOverVisible(false);
-        this.gameLoop.start();
+        this.persistenceController.saveGame(it.unibo.jpou.mvc.model.Room.BEDROOM);
+        Platform.exit();
     }
 
     @Override
