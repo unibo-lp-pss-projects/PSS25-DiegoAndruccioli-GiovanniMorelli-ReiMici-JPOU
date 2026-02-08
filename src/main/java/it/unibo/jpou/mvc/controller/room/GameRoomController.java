@@ -64,6 +64,7 @@ public final class GameRoomController {
         this.activeMinigame = new FruitCatcherControllerImpl(minigameView, coins -> {
             LOGGER.info("Minigame finished. Coins won: " + coins);
             this.model.addCoins(coins);
+            this.model.play();
             closeMinigame(minigameView);
         });
 

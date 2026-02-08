@@ -139,11 +139,11 @@ public final class PouLogic {
     }
 
     /**
-     * Play with Pou.
+     * Play with Minigames and modify statistics.
      */
     public void play() {
         if (canModify()) {
-            this.gameRoomLogic.play(this.fun);
+            this.gameRoomLogic.play(this.fun, this.energy);
         }
     }
 
