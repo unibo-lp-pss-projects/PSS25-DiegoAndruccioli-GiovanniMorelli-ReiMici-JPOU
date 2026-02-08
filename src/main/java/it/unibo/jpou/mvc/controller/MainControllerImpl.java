@@ -301,6 +301,10 @@ public final class MainControllerImpl implements MainController {
 
     @Override
     public void stop() {
+        if (this.persistenceController != null) {
+            this.persistenceController.saveGame(this.currentRoom);
+            LOGGER.info("Salvataggio automatico alla chiusura");
+        }
         this.gameLoop.shutdown();
         if (this.gameRoomController != null) {
             this.gameRoomController.shutdown();
