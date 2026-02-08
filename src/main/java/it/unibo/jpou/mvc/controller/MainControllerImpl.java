@@ -58,9 +58,6 @@ public final class MainControllerImpl implements MainController {
     private final InfirmaryController infirmaryController;
     private final BedroomController bedroomController;
 
-    @SuppressWarnings("PMD.UnusedPrivateField")
-    private final BathroomController bathroomController;
-
     private final PersistenceController persistenceController;
     private final PauseController pauseController;
     private final GameOverController gameOverController;
@@ -107,7 +104,7 @@ public final class MainControllerImpl implements MainController {
                 this.mainView,
                 this.inventory);
 
-        this.bathroomController = new BathroomController(
+        new BathroomController(
                 this.model,
                 this.bathroomView,
                 () -> Platform.runLater(this::updateGlobalStatistics));
