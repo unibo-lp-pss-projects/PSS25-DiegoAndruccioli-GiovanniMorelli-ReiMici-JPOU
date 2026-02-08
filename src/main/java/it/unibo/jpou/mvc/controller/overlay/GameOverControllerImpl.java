@@ -1,7 +1,7 @@
 package it.unibo.jpou.mvc.controller.overlay;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import it.unibo.jpou.mvc.controller.PersistenceController;
+import it.unibo.jpou.mvc.controller.persistence.PersistenceController;
 import it.unibo.jpou.mvc.model.PouLogic;
 import javafx.application.Platform;
 
