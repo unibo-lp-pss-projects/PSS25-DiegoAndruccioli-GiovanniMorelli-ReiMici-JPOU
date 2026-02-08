@@ -1,6 +1,6 @@
 package it.unibo.jpou.mvc.model.roomlogic;
 
-import it.unibo.jpou.mvc.model.PouStatistics;
+import it.unibo.jpou.mvc.model.statistics.PouStatistics;
 import it.unibo.jpou.mvc.model.items.consumable.potion.Potion;
 import it.unibo.jpou.mvc.model.items.consumable.potion.HealthPotion;
 import it.unibo.jpou.mvc.model.items.consumable.potion.EnergyPotion;

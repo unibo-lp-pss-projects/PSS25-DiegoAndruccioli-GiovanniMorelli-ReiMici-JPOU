@@ -1,4 +1,4 @@
-package it.unibo.jpou.mvc.controller;
+package it.unibo.jpou.mvc.controller.persistence;
 
 import it.unibo.jpou.mvc.model.Room;
 

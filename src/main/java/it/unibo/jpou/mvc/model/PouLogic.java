@@ -14,6 +14,7 @@ import it.unibo.jpou.mvc.model.statistics.EnergyStatistic;
 import it.unibo.jpou.mvc.model.statistics.FunStatistic;
 import it.unibo.jpou.mvc.model.statistics.HealthStatistic;
 import it.unibo.jpou.mvc.model.statistics.HungerStatistic;
+import it.unibo.jpou.mvc.model.statistics.PouStatistics;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -139,11 +140,11 @@ public final class PouLogic {
     }
 
     /**
-     * Play with Pou.
+     * Play with Minigames and modify statistics.
      */
     public void play() {
         if (canModify()) {
-            this.gameRoomLogic.play(this.fun);
+            this.gameRoomLogic.play(this.fun, this.energy);
         }
     }
 

@@ -2,7 +2,7 @@ package it.unibo.jpou.mvc.persistence;
 
 import it.unibo.jpou.mvc.model.PouCoins;
 import it.unibo.jpou.mvc.model.PouState;
-import it.unibo.jpou.mvc.model.PouStatistics;
+import it.unibo.jpou.mvc.model.statistics.PouStatistics;
 import it.unibo.jpou.mvc.model.Room;
 import it.unibo.jpou.mvc.model.items.durable.skin.DefaultSkin;
 import it.unibo.jpou.mvc.model.items.durable.skin.GreenSkin;

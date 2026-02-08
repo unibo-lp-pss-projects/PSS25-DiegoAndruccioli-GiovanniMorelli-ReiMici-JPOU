@@ -1,4 +1,4 @@
-package it.unibo.jpou.mvc.model;
+package it.unibo.jpou.mvc.model.statistics;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
