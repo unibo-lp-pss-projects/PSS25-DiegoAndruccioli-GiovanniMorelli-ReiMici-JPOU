@@ -2,61 +2,9 @@
     -fx-background-color: #ffb3b3;
 }
 
-.room-title {
-    -fx-font-size: 24px;
+.selected-item-label {
+    -fx-font-size: 18px;
+    -fx-text-fill: #000000;
     -fx-font-weight: bold;
-    -fx-text-fill: #333333;
-}
-
-.feedback-label {
-    -fx-font-size: 14px;
-    -fx-text-fill: #555555;
-    -fx-font-weight: bold;
-}
-
-.bottom-panel {
-    -fx-padding: 10;
-    -fx-background-color: transparent;
-    -fx-border-color: #ffcccc;
-    -fx-border-width: 2 0 0 0;
-}
-
-.food-shelf {
-    -fx-padding: 5;
-    -fx-spacing: 10;
-}
-
-.food-card {
-    -fx-background-color: white;
-    -fx-border-color: #888;
-    -fx-border-width: 1;
-    -fx-min-width: 80px;
-    -fx-min-height: 80px;
-    -fx-cursor: hand;
-}
-
-.food-card:hover {
-    -fx-background-color: #eeeeee;
-}
-
-.food-name {
-    -fx-font-size: 12px;
-    -fx-text-fill: black;
-    -fx-font-weight: normal;
-}
-
-.food-qty {
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-    -fx-text-fill: black;
-}
-
-.shop-link-button {
-    -fx-font-size: 14px;
-}
-
-.selected-food-label {
-    -fx-font-size: 28px;
-    -fx-text-fill: #333333;
-    -fx-font-weight: bold;
+    -fx-padding: 10 0 20 0;
 }

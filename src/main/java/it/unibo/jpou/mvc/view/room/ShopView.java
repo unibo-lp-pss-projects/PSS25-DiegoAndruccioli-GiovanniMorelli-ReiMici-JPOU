@@ -28,7 +28,7 @@ public final class ShopView extends AbstractRoomView {
      * Constructor.
      */
     public ShopView() {
-        super("Market");
+        super("Shop");
 
         this.getStylesheets().add(Objects.requireNonNull(
                 getClass().getResource("/style/room/styleShopView.css")).toExternalForm());
@@ -36,7 +36,7 @@ public final class ShopView extends AbstractRoomView {
                 getClass().getResource("/style/room/defaultRoom.css")).toExternalForm());
         this.getStyleClass().add("shop-view-minimal");
 
-        this.feedbackLabel = new Label("CHOOSE AN ITEM");
+        this.feedbackLabel = new Label("");
         this.feedbackLabel.getStyleClass().add("simple-feedback");
 
         this.cardsContainer = new FlowPane();

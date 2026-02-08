@@ -1,11 +1,8 @@
 package it.unibo.jpou.mvc.view.room;
 
 import it.unibo.jpou.mvc.model.items.consumable.food.Food;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,8 +17,6 @@ import java.util.function.Consumer;
  */
 public final class KitchenView extends AbstractRoomView {
 
-    private static final int TOP_PADDING = 30;
-    private static final double SPACING = 10.0;
     private static final String ACTION_BTN_STYLE = "action-button";
 
     private final Label foodLabel;
@@ -44,18 +39,10 @@ public final class KitchenView extends AbstractRoomView {
                 .getResource("/style/room/defaultRoom.css")).toExternalForm());
         this.getStyleClass().add("kitchen-view");
 
-        final VBox topContainer = new VBox(SPACING);
-        topContainer.setAlignment(Pos.CENTER);
-        topContainer.setPadding(new Insets(TOP_PADDING, 0, 0, 0));
-
-        final Label titleLabel = new Label("KITCHEN");
-        titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: black;");
-
         this.foodLabel = new Label("Empty");
         this.foodLabel.getStyleClass().add("selected-item-label");
 
-        topContainer.getChildren().addAll(titleLabel, this.foodLabel);
-        this.setTop(topContainer);
+        this.addHeaderContent(this.foodLabel);
 
         this.eatButton = new Button("Eat");
         this.eatButton.getStyleClass().add(ACTION_BTN_STYLE);

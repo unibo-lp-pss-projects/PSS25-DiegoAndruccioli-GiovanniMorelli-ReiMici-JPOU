@@ -2,11 +2,8 @@ package it.unibo.jpou.mvc.view.room;
 
 import it.unibo.jpou.mvc.model.PouState;
 import it.unibo.jpou.mvc.model.items.durable.skin.Skin;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +17,6 @@ import java.util.function.Consumer;
  */
 public final class BedroomView extends AbstractRoomView {
 
-    private static final int TOP_PADDING = 30;
-    private static final double SPACING = 10.0;
     private static final String NIGHT_MODE_STYLE = "night-mode";
     private static final String ACTION_BTN_STYLE = "action-button";
 
@@ -46,18 +41,10 @@ public final class BedroomView extends AbstractRoomView {
                 .getResource("/style/room/defaultRoom.css")).toExternalForm());
         this.getStyleClass().add("bedroom-view");
 
-        final VBox topContainer = new VBox(SPACING);
-        topContainer.setAlignment(Pos.CENTER);
-        topContainer.setPadding(new Insets(TOP_PADDING, 0, 0, 0));
-
-        final Label titleLabel = new Label("BEDROOM");
-        titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: black;");
-
         this.feedbackLabel = new Label("Wardrobe empty");
         this.feedbackLabel.getStyleClass().add("selected-item-label");
 
-        topContainer.getChildren().addAll(titleLabel, this.feedbackLabel);
-        this.setTop(topContainer);
+        this.addHeaderContent(this.feedbackLabel);
 
         this.actionButton = new Button("Sleep");
         this.actionButton.getStyleClass().add(ACTION_BTN_STYLE);
@@ -86,6 +73,7 @@ public final class BedroomView extends AbstractRoomView {
         this.availableSkins = new ArrayList<>(skins.keySet());
         if (this.availableSkins.isEmpty()) {
             this.feedbackLabel.setText("Wardrobe empty");
+            this.feedbackLabel.setStyle("");
             this.currentIndex = -1;
             this.selectSkinButton.setDisable(true);
             this.nextSkinButton.setDisable(true);

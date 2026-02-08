@@ -2,10 +2,21 @@
     -fx-background-color: #FFFF00;
 }
 
-.bedroom-view.night-mode {
+.selected-item-label {
+    -fx-font-size: 18px;
+    -fx-text-fill: #000000;
+    -fx-font-weight: bold;
+    -fx-padding: 10 0 20 0;
+}
+
+.night-mode {
     -fx-background-color: #8B8000;
 }
 
-.bedroom-view.night-mode .selected-item-label {
-    -fx-text-fill: #FFFFFF;
+.night-mode .room-title {
+    -fx-text-fill: #ecf0f1;
+}
+
+.night-mode .selected-item-label {
+    -fx-text-fill: #bdc3c7;
 }

@@ -20,7 +20,6 @@
     -fx-cursor: hand;
 }
 
-/* Hover: Feedback visivo sobrio */
 .rounded-card:hover {
     -fx-border-color: #333333;
     -fx-background-color: #fafafa;

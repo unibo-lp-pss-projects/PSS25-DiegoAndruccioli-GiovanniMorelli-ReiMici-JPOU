@@ -1,11 +1,8 @@
 package it.unibo.jpou.mvc.view.room;
 
 import it.unibo.jpou.mvc.model.items.consumable.potion.Potion;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,8 +17,6 @@ import java.util.function.Consumer;
  */
 public final class InfirmaryView extends AbstractRoomView {
 
-    private static final int TOP_PADDING = 30;
-    private static final double SPACING = 10.0;
     private static final String ACTION_BTN_STYLE = "action-button";
 
     private final Label potionLabel;
@@ -44,18 +39,10 @@ public final class InfirmaryView extends AbstractRoomView {
                 .getResource("/style/room/defaultRoom.css")).toExternalForm());
         this.getStyleClass().add("infirmary-view");
 
-        final VBox topContainer = new VBox(SPACING);
-        topContainer.setAlignment(Pos.CENTER);
-        topContainer.setPadding(new Insets(TOP_PADDING, 0, 0, 0));
-
-        final Label titleLabel = new Label("INFIRMARY");
-        titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: black;");
-
         this.potionLabel = new Label("Empty");
         this.potionLabel.getStyleClass().add("selected-item-label");
 
-        topContainer.getChildren().addAll(titleLabel, this.potionLabel);
-        this.setTop(topContainer);
+        this.addHeaderContent(this.potionLabel);
 
         this.useButton = new Button("Use");
         this.useButton.getStyleClass().add(ACTION_BTN_STYLE);
